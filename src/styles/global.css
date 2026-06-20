@@ -66,6 +66,15 @@ h3 {
   text-wrap: balance;
 }
 
+/* Default-Größen je Ebene (Sektions-Headlines). Hero-<h1> übersteuert lokal. */
+h2 {
+  font-size: var(--fs-500);
+}
+
+h3 {
+  font-size: var(--fs-400);
+}
+
 p {
   text-wrap: pretty;
   max-width: 65ch;
@@ -81,6 +90,42 @@ p {
 
 .section {
   padding-block: var(--space-3xl);
+}
+
+/* ---------- Tonzonen (Sektions-Grundlage, M1) ---------- *
+ * Zwei verwandte Tonwelten aus den docs (Farbwelt: bauplan + brainstorming):
+ *  - warm/holzig -> Handwerk (Hero, Über, Kontakt = hell; Werkstatt/Counter/Footer = dunkel)
+ *  - rot/gelb     -> Sport/Spaß (Fußball)
+ * Eine Sektion setzt NUR ihre Tonzonen-Klasse; konkrete Inhalte/Bilder folgen je
+ * Meilenstein. Jede Zone definiert lokal --color-accent, damit Buttons/Highlights in der
+ * jeweiligen Welt stimmig sind (z. B. Gelb-Akzent auf dunklem/rotem Grund).
+ */
+.tone-warm {
+  background-color: var(--bg);
+  color: var(--text);
+  --color-accent: var(--color-red);
+}
+
+.tone-wood {
+  background-color: var(--bg-dark);
+  color: var(--text-on-dark);
+  --color-accent: var(--color-yellow);
+}
+
+.tone-sport {
+  background-color: var(--color-red);
+  color: var(--text-on-dark);
+  --color-accent: var(--color-yellow);
+}
+
+/* Platzhalter-Notiz für noch leere Sektionen (M1). Verschwindet, sobald die
+ * jeweilige Sektion (M2–M9) echten Inhalt bekommt. */
+.placeholder-note {
+  margin-top: var(--space-md);
+  font-size: var(--fs-100);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, currentColor 55%, transparent);
 }
 
 /* Visuell verbergen, für Screenreader erhalten */
