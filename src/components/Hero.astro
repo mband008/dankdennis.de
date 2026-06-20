@@ -1,0 +1,33 @@
+---
+/**
+ * Hero.astro — Sektion 1 (Above the fold).
+ * M1: leeres Grundgerüst (Anker + Container + Headline). Split-Layout, Untertitel,
+ * Konfetti-Button folgen in M2/M3. Trägt die einzige <h1> der Seite.
+ * Tonzone: warm/holzig (hell).
+ */
+---
+
+<section id="hero" class="section tone-warm">
+  <div class="container">
+    <p class="kicker">dankdennis.de</p>
+    <h1>Problem? Dank Dennis.</h1>
+    <p class="placeholder-note">Hero — Inhalt folgt (M2/M3)</p>
+  </div>
+</section>
+
+<style>
+  .kicker {
+    font-family: var(--font-display);
+    font-weight: var(--fw-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    font-size: var(--fs-100);
+  }
+
+  h1 {
+    font-size: var(--fs-600);
+    font-weight: var(--fw-black);
+    margin-block: var(--space-md) 0;
+  }
+</style>
