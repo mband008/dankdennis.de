@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Astro build output & cache
+dist/
+.astro/
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+.playwright-mcp/
+
+# Manuelle Browser-Test-Screenshots (Belege, nicht versioniert)
+/m0-*.png
+
+# Claude Code: lokale Overrides (nicht versioniert)
+.claude/settings.local.json
+
+# Environment & OS
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log

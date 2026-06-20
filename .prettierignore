@@ -1,0 +1,11 @@
+# Build output & generated
+dist/
+.astro/
+node_modules/
+
+# Test artefacts
+test-results/
+playwright-report/
+
+# Lockfile (von npm verwaltet)
+package-lock.json
