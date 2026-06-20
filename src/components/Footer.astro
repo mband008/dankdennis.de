@@ -1,0 +1,21 @@
+---
+/**
+ * Footer.astro — Sektion 7.
+ * M1: schlichter Footer mit dynamischem Jahr. Optionales Konfetti-Easter-Egg
+ * folgt in M9. Tonzone: warm/holzig (dunkel) — ruhiger Abschluss.
+ */
+const year = new Date().getFullYear();
+---
+
+<footer id="footer" class="section tone-wood">
+  <div class="container">
+    <p class="footer__line">Dank Dennis · {year}</p>
+  </div>
+</footer>
+
+<style>
+  .footer__line {
+    font-family: var(--font-display);
+    font-weight: var(--fw-bold);
+  }
+</style>
