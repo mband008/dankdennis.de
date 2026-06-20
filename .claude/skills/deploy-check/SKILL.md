@@ -5,8 +5,9 @@ description: Pre-Deploy-Checkliste für das Coolify-Static-Deploy von dankdennis
 
 # deploy-check
 
-Letzter Check, bevor der Branch an den Menschen übergeben wird, der nach `main` pusht/merged
-(Coolify deployt von dort automatisch). Claude pusht/merged nie selbst.
+Letzter Check, bevor Claude den grünen Branch lokal nach `main` merged (`--no-ff`) und dem
+Menschen meldet, dass `main` push-bereit ist (Coolify deployt nach dem Push automatisch).
+Claude merged lokal, aber pusht/pullt nie selbst.
 
 ## Checkliste
 
@@ -29,5 +30,6 @@ Letzter Check, bevor der Branch an den Menschen übergeben wird, der nach `main`
 
 ## Übergabe
 
-- Dem Menschen melden: Branch ist grün und bereit. Er pusht/merged nach `main`.
+- Branch grün → lokal mit `git merge --no-ff` nach `main` mergen, dann melden:
+  „`main` ist push-bereit." Den Push macht der Mensch.
 - Der native `pre-push`-Hook ist das harte Gate: ein roter Build verhindert den Push.

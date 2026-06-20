@@ -20,12 +20,14 @@ erfolgt erst nach Freigabe.
 - Tech-Stack: **Astro** (statischer Output, automatische Bildoptimierung wegen vieler Fotos)
 - Hosting: **Self-hosted via Coolify** — Auto-Deploy bei Push auf `main`, Static-Build
   `npm run build` → Output `dist/`, Domain + SSL übernimmt Coolify
-- **Git-Rollenteilung:** `git push`/`git pull`/`git fetch` sowie Merges nach `main` macht
-  **ausschließlich der Mensch**. Claude arbeitet rein lokal: Branch anlegen, committen,
-  Tests fahren — und übergibt fertige, grüne Feature-Branches. Erzwungen per Hook.
-- **Hooks (Claude Code):** Edit/Write + `git commit` auf `main` blockiert; `git push`/
-  `git pull`/`git fetch` auf **jedem** Branch blockiert (nur der Mensch); PostToolUse
-  Auto-Format; Tests-vor-Commit als Reminder.
+- **Git-Rollenteilung:** `git push`/`git pull`/`git fetch` macht **ausschließlich der
+  Mensch**. **Merges nach `main` macht Claude lokal** (`git merge --no-ff`, ein Merge-Commit
+  pro Meilenstein). Claude arbeitet sonst lokal: Branch anlegen, committen, Tests fahren,
+  fertige grüne Meilensteine nach `main` mergen — und meldet „`main` ist push-bereit".
+  Erzwungen per Hook.
+- **Hooks (Claude Code):** normale Edit/Write + normaler `git commit` auf `main` blockiert
+  (`git merge` und Merge-Commit erlaubt); `git push`/`git pull`/`git fetch` auf **jedem**
+  Branch blockiert (nur der Mensch); PostToolUse Auto-Format; Tests-vor-Commit als Reminder.
 - **Test-Gate vor Produktion:** nativer git **`pre-push`-Hook**, der bei Push auf `main`
   `npm run verify` erzwingt und rote Pushes blockt (schützt den manuellen Push des Menschen).
 - **Fonts self-hosted** (kein Google-Fonts-CDN) — Datenschutz + Performance.
@@ -170,13 +172,17 @@ Kein „Vibe-Coding": erst verstehen & planen, dann umsetzen, dann testen. Nutze
 - Ein Branch = ein Meilenstein/eine Funktion.
 - Commits: **Conventional Commits** (englisch), z. B. `feat(hero): add split layout`,
   `fix(counter): trigger on scroll`. Kleine, fokussierte Commits.
-- **Claude arbeitet rein LOKAL:** Branch anlegen, committen, Tests fahren. **NIEMALS**
-  `git push`, `git pull` oder `git fetch` — das macht ausschließlich der Mensch (per Hook
-  erzwungen, auf jedem Branch).
-- **`main` ist geschützt:** Edits/Writes und `git commit` auf `main` werden per Hook
-  blockiert. Merges nach `main` und alle Pushes macht der Mensch.
-- Claude übergibt fertige, **grüne** Feature-Branches (`npm run verify` lokal grün). Der
-  native `pre-push`-Hook erzwingt zusätzlich `npm run verify` beim manuellen Push auf `main`.
+- **Claude arbeitet lokal — inkl. Merge nach `main`:** Branch anlegen, committen, Tests
+  fahren UND fertige Meilensteine lokal nach `main` mergen. **NIEMALS** `git push`,
+  `git pull` oder `git fetch` — das macht ausschließlich der Mensch (per Hook erzwungen).
+- **`main` ist geschützt:** normale Edits/Writes und normale `git commit` auf `main` werden
+  per Hook blockiert (Ausnahme: reine Doku). **Erlaubt** ist das Mergen nach `main`
+  (`git merge` und Merge-Commit). Push/Pull bleiben dem Menschen vorbehalten.
+- **Meilenstein-Merge:** Claude merged den grünen Feature-Branch lokal mit
+  `git merge --no-ff` nach `main` (ein Merge-Commit pro Meilenstein) und meldet dann
+  „`main` ist push-bereit". Den Push macht der Mensch.
+- Vor dem Merge ist `npm run verify` lokal grün. Der native `pre-push`-Hook erzwingt
+  `npm run verify` zusätzlich beim manuellen Push des Menschen auf `main`.
 
 ## Definition of Done (pro Meilenstein)
 
@@ -351,9 +357,9 @@ Hook-Skript-Inhalte entstehen in M0.
 
 - **M12 — Deploy (Coolify)** *(→ M11)*
   Coolify-App: Static-Build `npm run build`, Publish-Dir `dist/`, Auto-Deploy-Webhook bei
-  Push auf `main`, Domain `dankdennis.de` + SSL. **Push/Merge auf `main` macht der Mensch**
-  (Claude übergibt grünen Branch); `pre-push`-Hook ist das Test-Gate. Skill `deploy-check`
-  als zusätzliche Pre-Deploy-Checkliste.
+  Push auf `main`, Domain `dankdennis.de` + SSL. **Merge nach `main` macht Claude lokal
+  (`--no-ff`); den Push macht der Mensch.** Der `pre-push`-Hook ist das Test-Gate. Skill
+  `deploy-check` als zusätzliche Pre-Deploy-Checkliste.
   **DoD:** Manueller Push auf `main` deployt automatisch; Seite unter dankdennis.de mit SSL
   erreichbar; `pre-push`-Gate nachweislich aktiv (roter Push wird verhindert).
 

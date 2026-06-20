@@ -42,14 +42,20 @@ Kein „Vibe-Coding": erst verstehen & planen, dann umsetzen, dann testen. Nutze
 - Ein Branch = ein Meilenstein/eine Funktion.
 - Commits: **Conventional Commits** (englisch), z. B. `feat(hero): add split layout`,
   `fix(counter): trigger on scroll`. Kleine, fokussierte Commits.
-- **Claude arbeitet rein LOKAL:** Branch anlegen, committen, Tests fahren. **NIEMALS**
-  `git push`, `git pull` oder `git fetch` — das macht ausschließlich der Mensch (per Hook
-  erzwungen, auf jedem Branch).
-- **`main` ist geschützt:** Edits/Writes und `git commit` auf `main` werden per Hook
-  blockiert (Ausnahme: reine Doku — `docs/`, `CLAUDE.md`, `ROADMAP.md`, `README.md`).
-  Merges nach `main` und alle Pushes macht der Mensch.
-- Claude übergibt fertige, **grüne** Feature-Branches (`npm run verify` lokal grün). Der
-  native `pre-push`-Hook erzwingt zusätzlich `npm run verify` beim manuellen Push auf `main`.
+- **Claude arbeitet lokal — inkl. Merge nach `main`:** Branch anlegen, committen, Tests
+  fahren UND fertige Meilensteine lokal nach `main` mergen. **NIEMALS** `git push`,
+  `git pull` oder `git fetch` — das macht ausschließlich der Mensch (per Hook erzwungen,
+  auf jedem Branch).
+- **`main` ist geschützt:** normale Edits/Writes und normale `git commit` auf `main` werden
+  per Hook blockiert (Ausnahme: reine Doku — `docs/`, `CLAUDE.md`, `ROADMAP.md`, `README.md`).
+  **Erlaubt** ist das Mergen nach `main` (`git merge` und der Merge-Commit). Push/Pull
+  bleiben dem Menschen vorbehalten.
+- **Meilenstein-Merge:** Claude merged den fertigen, **grünen** Feature-Branch lokal mit
+  `git merge --no-ff` nach `main` (ein klarer Merge-Commit pro Meilenstein), z. B.
+  `git checkout main && git merge --no-ff feat/hero`. Danach meldet Claude: „`main` ist
+  lokal bereit zum Push." Den Push macht der Mensch.
+- Vor dem Merge ist `npm run verify` lokal grün. Der native `pre-push`-Hook erzwingt
+  `npm run verify` zusätzlich beim manuellen Push des Menschen auf `main`.
 
 ## Definition of Done (pro Meilenstein)
 
@@ -80,9 +86,10 @@ Einmalig nötig für die Browser-Tests: `npx playwright install chromium` (lädt
 ## Hooks — zwei Ebenen
 
 - **Claude-Code-Hooks** (`.claude/settings.json` + `.claude/hooks/*.sh`): steuern, was
-  Claude darf. `guard-no-main-edit.sh` (kein Code-Write/Commit auf `main`),
-  `guard-no-push-pull.sh` (kein push/pull/fetch), PostToolUse-Prettier-Format,
-  Commit-Reminder. Die `*.sh` brauchen das **Exec-Bit** (sonst feuern sie still nicht).
+  Claude darf. `guard-no-main-edit.sh` (kein normaler Code-Write/Commit auf `main`; ein
+  `git merge` und der Merge-Commit sind erlaubt), `guard-no-push-pull.sh` (kein
+  push/pull/fetch), PostToolUse-Prettier-Format, Commit-Reminder. Die `*.sh` brauchen das
+  **Exec-Bit** (sonst feuern sie still nicht).
 - **Nativer git-Hook** (`.githooks/pre-push`): hartes Test-Gate. Bei Push auf `refs/heads/main`
   läuft `npm run verify`; rot ⇒ Push abgebrochen. Feature-Branch-Pushes laufen ungebremst.
 

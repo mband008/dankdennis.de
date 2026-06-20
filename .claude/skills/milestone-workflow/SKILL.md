@@ -19,7 +19,8 @@ saubere Runde dieser Schleife.
 1. **Branch erstellen** — nie auf `main` arbeiten.
    - Namensschema: `feat/<sektion>`, `fix/<kurz>`, `chore/<kurz>` (z. B. `feat/hero`).
    - `git checkout -b feat/<name>`
-   - Erinnerung: Pushen/Mergen macht der Mensch. Claude bleibt lokal (per Hook erzwungen).
+   - Erinnerung: Mergen nach `main` macht Claude lokal (`--no-ff`); Pushen/Pullen macht der
+     Mensch (per Hook erzwungen).
 
 2. **Discovery & Analyse** — Ziel und Definition of Done klären.
    - Die Quelle der Wahrheit für Inhalte lesen: `docs/dankdennis_bauplan.md`,
@@ -44,4 +45,6 @@ saubere Runde dieser Schleife.
 ## Abschluss
 
 - Kleine Conventional Commits (englisch): `feat(hero): add split layout`.
-- DoD geprüft? Dann dem Menschen den fertigen, grünen Branch übergeben — er pusht/merged.
+- DoD geprüft und `npm run verify` grün? Dann den Branch lokal mit `git merge --no-ff` nach
+  `main` mergen (ein Merge-Commit pro Meilenstein) und melden: „`main` ist push-bereit".
+  Den Push macht der Mensch.

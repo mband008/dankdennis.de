@@ -75,8 +75,9 @@ Status-Legende: ✅ erledigt · 🔜 als Nächstes · ⬜ offen
 
 - **M12 — Deploy (Coolify)** ⬜ _(→ M11)_
   Coolify-App: Static-Build `npm run build`, Publish-Dir `dist/`, Auto-Deploy-Webhook bei
-  Push auf `main`, Domain `dankdennis.de` + SSL. **Push/Merge auf `main` macht der Mensch**;
-  `pre-push`-Hook ist das Test-Gate. Skill `deploy-check` als Pre-Deploy-Checkliste.
+  Push auf `main`, Domain `dankdennis.de` + SSL. **Merge nach `main` macht Claude lokal
+  (`--no-ff`); den Push macht der Mensch.** Der `pre-push`-Hook ist das Test-Gate. Skill
+  `deploy-check` als Pre-Deploy-Checkliste.
   **DoD:** Manueller Push auf `main` deployt automatisch; Seite unter dankdennis.de mit SSL
   erreichbar; `pre-push`-Gate nachweislich aktiv (roter Push wird verhindert).
 

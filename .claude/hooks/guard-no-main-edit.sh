@@ -2,16 +2,21 @@
 #
 # guard-no-main-edit.sh — Claude-Code PreToolUse-Guard.
 #
-# Schützt den main/master-Branch vor versehentlichen Änderungen DURCH CLAUDE:
-#   - Edit/Write/MultiEdit auf main/master  -> blockiert
+# Schützt den main/master-Branch vor versehentlicher NORMALER Entwicklung DURCH CLAUDE:
+#   - Edit/Write/MultiEdit auf main/master       -> blockiert
 #     (Ausnahme: reine Doku — Pfade unter docs/ sowie CLAUDE.md/ROADMAP.md/README.md)
-#   - `git commit` auf main/master          -> blockiert
+#   - normaler `git commit` auf main/master       -> blockiert
+#
+# ERLAUBT auf main (Git-Rollenteilung: Merges nach main macht Claude lokal):
+#   - `git merge …` (Branch in main mergen; enthält kein `commit`, fällt durch)
+#   - `git commit`, der einen LAUFENDEN Merge abschließt (MERGE_HEAD existiert,
+#     z. B. Merge-Commit nach Konfliktauflösung)
 #
 # Auf jedem anderen Branch tut der Guard nichts (Exit 0, früh).
 # Blockieren = Exit-Code 2 (Claude Code zeigt die stderr-Meldung und bricht den Call ab).
 #
-# Hinweis Git-Rollenteilung: Pushen/Pullen/Mergen macht ausschließlich der Mensch
-# (separater Guard guard-no-push-pull.sh). Siehe CLAUDE.md.
+# Hinweis Git-Rollenteilung: Pushen/Pullen/Fetchen macht ausschließlich der Mensch
+# (separater Guard guard-no-push-pull.sh). Merges nach main macht Claude. Siehe CLAUDE.md.
 
 set -euo pipefail
 
@@ -37,11 +42,17 @@ fi
 
 tool="$(printf '%s' "$input" | jq -r '.tool_name // empty')"
 
-# 3a) Bash: nur `git commit` auf main blockieren.
+# 3a) Bash: nur NORMALEN `git commit` auf main blockieren.
+#     `git merge` enthält kein `commit` und fällt durch (erlaubt — Claude merged nach main).
 if [ "$tool" = "Bash" ]; then
   cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty')"
   if printf '%s' "$cmd" | grep -Eq '(^|[^[:alnum:]])git[[:space:]]+commit([^[:alnum:]]|$)'; then
-    block "git commit auf '$branch' ist gesperrt — Commits gehören auf einen Feature-Branch."
+    # Ausnahme: Abschluss eines laufenden Merges (Merge-Commit) ist erlaubt.
+    git_dir="$(git rev-parse --git-dir 2>/dev/null || echo ".git")"
+    if [ -f "$git_dir/MERGE_HEAD" ]; then
+      exit 0
+    fi
+    block "git commit auf '$branch' ist gesperrt — normale Commits gehören auf einen Feature-Branch (Merge-Commits sind erlaubt)."
   fi
   exit 0
 fi

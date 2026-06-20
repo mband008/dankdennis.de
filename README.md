@@ -51,11 +51,12 @@ Entwicklung folgt einer verbindlichen **5-Schritt-Schleife** (Branch → Discove
 Implementieren → Testen) — Details in [`CLAUDE.md`](./CLAUDE.md), Meilensteine in
 [`ROADMAP.md`](./ROADMAP.md).
 
-- Gearbeitet wird **nie direkt auf `main`**, immer auf Feature-Branches.
-- **`git push` / `git pull` / `git fetch` sowie Merges nach `main` macht ausschließlich der
-  Mensch.** Zwei Schutzebenen erzwingen das:
-  - **Claude-Code-Hooks** (`.claude/`): blockieren Code-Writes/Commits auf `main` und
-    push/pull/fetch generell.
+- Gearbeitet wird **nie direkt auf `main`** entwickelt, immer auf Feature-Branches.
+- **Merges nach `main` macht Claude lokal** (`git merge --no-ff`, ein Merge-Commit pro
+  Meilenstein). **`git push` / `git pull` / `git fetch` macht ausschließlich der Mensch.**
+  Zwei Schutzebenen erzwingen das:
+  - **Claude-Code-Hooks** (`.claude/`): blockieren normale Code-Writes/Commits auf `main`
+    (Merge-Commits sind erlaubt) und push/pull/fetch generell.
   - **Nativer `pre-push`-Hook** (`.githooks/pre-push`): erzwingt `npm run verify` beim Push
     auf `main` — ein roter Build wird abgewiesen, damit Coolify nie Rotes deployt.
 
