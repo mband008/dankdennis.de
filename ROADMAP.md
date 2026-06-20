@@ -18,13 +18,13 @@ Status-Legende: ✅ erledigt · 🔜 als Nächstes · ⬜ offen
   grün; Smoke-Test grün; Claude-Hooks aktiv (Edit/Commit auf `main` + push/pull/fetch
   blockiert); `pre-push`-Hook aktiv (`core.hooksPath=.githooks`, Hook-Skripte ausführbar).
 
-- **M1 — Layout-Grundgerüst & Sektions-Platzhalter** 🔜 _(→ M0)_
+- **M1 — Layout-Grundgerüst & Sektions-Platzhalter** ✅ _(→ M0)_
   `index.astro`-Struktur: alle 7 Sektionen als leere Komponenten mit Headings + responsivem
   Container; Scroll-Fluss; warme/holzige vs. rot/gelbe Tonzonen als CSS-Grundlage.
   **DoD:** Alle Sektionen in korrekter Reihenfolge sichtbar, responsive Container steht,
   Test prüft Vorhandensein aller Section-Anker.
 
-- **M2 — Hero** ⬜ _(→ M1)_
+- **M2 — Hero** 🔜 _(→ M1)_
   Split-Layout (Text links, Platzhalterbild rechts; mobil Bild oben). Headline
   „Problem? Dank Dennis.", Untertitel, Button „Dank Dennis!" (ohne Konfetti-Logik noch).
   **DoD:** Hero responsive korrekt, Headline/Untertitel/Button im Test vorhanden.
