@@ -1,21 +1,52 @@
 ---
 /**
  * Hero.astro — Sektion 1 (Above the fold).
- * M1: leeres Grundgerüst (Anker + Container + Headline). Split-Layout, Untertitel,
- * Konfetti-Button folgen in M2/M3. Trägt die einzige <h1> der Seite.
+ * M2: Split-Layout (Text links, Platzhalterbild rechts; mobil Bild oben). Headline,
+ * Untertitel und Button „Dank Dennis!" (NOCH OHNE Konfetti-Logik — die folgt in M3).
+ * Trägt die einzige <h1> der Seite. Inhalte aus docs/dankdennis_bauplan.md §1.
  * Tonzone: warm/holzig (hell).
+ *
+ * Das Bild ist bewusst eine CSS-Platzhalter-Box (foto1 = Werkstatt-Action, Hochformat):
+ * echte Fotos werden gebündelt in M10 über astro:assets eingebaut (Skill add-photo).
+ * Im DOM steht der Text zuerst (h1 früh = A11y/SEO); auf Mobil holt CSS das Bild nach oben.
  */
 ---
 
-<section id="hero" class="section tone-warm">
-  <div class="container">
-    <p class="kicker">dankdennis.de</p>
-    <h1>Problem? Dank Dennis.</h1>
-    <p class="placeholder-note">Hero — Inhalt folgt (M2/M3)</p>
+<section id="hero" class="section tone-warm hero">
+  <div class="container hero__grid">
+    <div class="hero__text">
+      <p class="kicker">dankdennis.de</p>
+      <h1>Problem? Dank Dennis.</h1>
+      <p class="hero__subtitle">
+        Tischler aus Überzeugung, Fußballer aus Leidenschaft – und der Typ, der
+        einfach anpackt.
+      </p>
+      <button type="button" class="btn hero__cta">Dank Dennis!</button>
+    </div>
+
+    <figure class="hero__media" aria-hidden="true">
+      <div class="hero__placeholder">
+        <span>Foto 1 — Werkstatt-Action</span>
+      </div>
+    </figure>
   </div>
 </section>
 
 <style>
+  .hero__grid {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+
+  /* Desktop: zwei Spalten, Text links / Bild rechts. */
+  @media (min-width: 48rem) {
+    .hero__grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: var(--space-2xl);
+    }
+  }
+
   .kicker {
     font-family: var(--font-display);
     font-weight: var(--fw-bold);
@@ -29,5 +60,77 @@
     font-size: var(--fs-600);
     font-weight: var(--fw-black);
     margin-block: var(--space-md) 0;
+  }
+
+  .hero__subtitle {
+    font-size: var(--fs-300);
+    line-height: var(--lh-normal);
+    margin-block: var(--space-lg) var(--space-xl);
+    color: color-mix(in srgb, currentColor 80%, transparent);
+  }
+
+  /* Button — verwendet die Tonzonen-Akzentfarbe; Konfetti-Handler folgt in M3. */
+  .btn {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-300);
+    color: var(--text-on-dark);
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: var(--space-sm) var(--space-xl);
+    transition:
+      background-color var(--motion-fast) var(--ease-standard),
+      transform var(--motion-fast) var(--ease-standard);
+  }
+
+  .btn:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-2px);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+  }
+
+  /* Platzhalterbild — Hochformat-Box, holziger Verlauf. Ersetzt durch echtes foto1 in M10. */
+  .hero__media {
+    margin: 0;
+  }
+
+  .hero__placeholder {
+    aspect-ratio: 3 / 4;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    background:
+      repeating-linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--bg-dark) 10%, transparent) 0,
+        color-mix(in srgb, var(--bg-dark) 10%, transparent) 2px,
+        transparent 2px,
+        transparent 14px
+      ),
+      color-mix(in srgb, var(--bg-dark) 6%, var(--bg));
+    border: 2px dashed color-mix(in srgb, var(--bg-dark) 25%, transparent);
+  }
+
+  .hero__placeholder span {
+    font-size: var(--fs-100);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 55%, transparent);
+  }
+
+  /* Mobil: Bild über den Text holen (docs: „Auf dem Handy: Bild oben, Text darunter"). */
+  @media (max-width: 47.999rem) {
+    .hero__media {
+      order: -1;
+    }
+
+    .hero__placeholder {
+      aspect-ratio: 4 / 3;
+    }
   }
 </style>
