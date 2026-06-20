@@ -5,7 +5,7 @@
 Greenfield-Projekt: persönliche One-Page-Visitenkarte **dankdennis.de** für Dennis
 (gelernter Tischler im Ladenbau, leidenschaftlicher Fußballer/Feldspieler bei ASG
 Vorwärts Dessau). Zielgruppe: potenzielle Arbeitgeber **und** neue Bekanntschaften —
-**kein Verkauf**. Markenkern: *„Verlässlicher Teamplayer, der anpackt und Probleme löst."*
+**kein Verkauf**. Markenkern: _„Verlässlicher Teamplayer, der anpackt und Probleme löst."_
 Roter Faden: das Meme **„Dank Dennis"**.
 
 Aktueller Stand: Das Repo enthält nur `docs/dankdennis_bauplan.md` und
@@ -16,6 +16,7 @@ diesem Schritt **noch nichts umgesetzt**; die Umsetzung des Fundaments (= Meilen
 erfolgt erst nach Freigabe.
 
 **Getroffene Entscheidungen (vom Nutzer bestätigt):**
+
 - Tech-Stack: **Astro** (statischer Output, automatische Bildoptimierung wegen vieler Fotos)
 - Hosting: **Self-hosted via Coolify** — Auto-Deploy bei Push auf `main`, Static-Build
   `npm run build` → Output `dist/`, Domain + SSL übernimmt Coolify
@@ -49,7 +50,7 @@ erfolgt erst nach Freigabe.
 - Client-Interaktionen (Konfetti, Counter) laufen als kleine `<script>`-Inseln —
   kein Framework-Overhead, kein Backend.
 
-*Begründung gegen pures HTML/CSS/JS:* funktioniert auch, aber manuelle Bildoptimierung
+_Begründung gegen pures HTML/CSS/JS:_ funktioniert auch, aber manuelle Bildoptimierung
 und fehlende Komponenten/Tooling widersprechen dem Wunsch nach strikt strukturierter,
 testbarer Arbeit. Astro liefert Struktur + Optimierung bei minimalem Build-Overhead.
 
@@ -126,7 +127,7 @@ Keine Requests an fonts.googleapis.com/fonts.gstatic.com.
 
 > Wird bei Freigabe als `CLAUDE.md` im Root angelegt. Entwurf:
 
-```markdown
+````markdown
 # dankdennis.de
 
 Persönliche One-Page-Visitenkarte für Dennis (gelernter Tischler im Ladenbau,
@@ -140,6 +141,7 @@ Konzept, Texte, Farben und Sektionen stehen in `docs/dankdennis_bauplan.md` und
 `docs/dankdennis_brainstorming.md` — diese sind die Quelle der Wahrheit für Inhalte.
 
 ## Tech-Stack
+
 - **Astro** (statischer Output, kein SSR), TypeScript für Skripte.
 - Reines CSS mit Design-Tokens in `src/styles/tokens.css` (keine UI-Library).
 - Client-Interaktionen client-seitig: `canvas-confetti` (Konfetti), IntersectionObserver
@@ -152,6 +154,7 @@ Konzept, Texte, Farben und Sektionen stehen in `docs/dankdennis_bauplan.md` und
   Animation. Wird in den Playwright-Tests geprüft.
 
 ## Verbindliche Arbeitsweise — gilt für JEDEN Meilenstein UND jede Funktion/jedes Fix
+
 1. **Branch erstellen** (nie direkt auf `main` arbeiten)
 2. **Discovery & Analyse** (docs/ + bestehenden Code lesen, Ziel + DoD klären)
 3. **Tasks erstellen** (TodoWrite: kleine, prüfbare Schritte)
@@ -162,6 +165,7 @@ Kein „Vibe-Coding": erst verstehen & planen, dann umsetzen, dann testen. Nutze
 `milestone-workflow`, um die Schleife zu starten, und `browser-test` für Schritt 5 (Browser).
 
 ## Branch- & Commit-Konventionen + Git-Rollenteilung
+
 - Branch-Namen: `feat/<sektion>`, `fix/<kurz>`, `chore/<kurz>` (z. B. `feat/hero`).
 - Ein Branch = ein Meilenstein/eine Funktion.
 - Commits: **Conventional Commits** (englisch), z. B. `feat(hero): add split layout`,
@@ -175,12 +179,14 @@ Kein „Vibe-Coding": erst verstehen & planen, dann umsetzen, dann testen. Nutze
   native `pre-push`-Hook erzwingt zusätzlich `npm run verify` beim manuellen Push auf `main`.
 
 ## Definition of Done (pro Meilenstein)
+
 - Funktion entspricht `docs/`-Vorgabe; responsive (mobil + Desktop).
 - `npm run check` grün (Astro-Check/Typecheck, Format, Build).
 - Playwright-Tests der Sektion grün; keine Konsolen-Fehler.
 - Echter Browser-Test bestätigt (Screenshot mobil + Desktop).
 
 ## Lokal starten & testen
+
 ```bash
 npm install            # einmalig
 npm run dev            # Dev-Server (HMR) auf http://localhost:4321
@@ -191,12 +197,14 @@ npm run test           # Playwright e2e (Browser-Tests)
 npm run test:headed    # Playwright sichtbar im Browser
 npm run verify         # check + test in einem (vor Commit/Push)
 ```
+````
 
 `npm install` aktiviert über das `prepare`-Script automatisch die nativen git-Hooks
 (`git config core.hooksPath .githooks`). Der `pre-push`-Hook blockt dann jeden roten Push
 auf `main`. Falls nötig manuell: `git config core.hooksPath .githooks`.
 
 ## Inhaltliche Leitplanken
+
 - Deutsch, Du-Form, verspielt aber glaubwürdig. Fußball begeistert, aber dosiert —
   Handwerk & Charakter führen.
 - Kontaktwege sind NOCH OFFEN → als Platzhalter-Buttons bauen, später nur Links eintragen.
@@ -205,10 +213,12 @@ auf `main`. Falls nötig manuell: `git config core.hooksPath .githooks`.
 - Counter-Zahl: Spaßzahl (z. B. 1.337), rein dekorativ.
 
 ## Deploy
+
 - Self-hosted via **Coolify**: Auto-Deploy bei **Push auf `main` (macht der Mensch)**,
   Static-Build `npm run build`, Publish-Dir `dist/`. Domain + SSL via Coolify.
 - Der Push auf `main` ist der einzige Weg in Produktion → der native `pre-push`-Hook
   (`npm run verify`) ist das harte Test-Gate. Details: Skill `deploy-check`.
+
 ```
 
 ---
@@ -377,14 +387,16 @@ Sektionen vorher mit Platzhaltern stabil stehen.
 
 **Tooling/Scripts in `package.json`:**
 ```
-dev        astro dev
-build      astro build
-preview    astro preview
-check      astro check && prettier --check . && astro build
-test       playwright test
+
+dev astro dev
+build astro build
+preview astro preview
+check astro check && prettier --check . && astro build
+test playwright test
 test:headed playwright test --headed
-verify     npm run check && npm run test
-prepare    git config core.hooksPath .githooks   # aktiviert den nativen pre-push-Hook
+verify npm run check && npm run test
+prepare git config core.hooksPath .githooks # aktiviert den nativen pre-push-Hook
+
 ```
 `verify` ist das Gate vor Commit/Push: der `pre-push`-Hook ruft es bei Push auf `main` auf,
 der Claude-Code-Reminder verweist beim Commit darauf.
@@ -406,3 +418,4 @@ Fonts self-hosted.
 - **Foto-Auswahl**: gemeinsam in M10.
 - **Counter-Zahl** & exaktes Trikot-Rot: in M7 bzw. Polish final festlegen.
 - **Display-Font** (Anton vs. Bricolage Grotesque): in M0/M1 zusammen entscheiden.
+```
