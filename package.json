@@ -12,7 +12,7 @@
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "verify": "npm run check && npm run test",
-    "prepare": "git config core.hooksPath .githooks"
+    "prepare": "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.0.0",
