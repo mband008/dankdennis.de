@@ -1,0 +1,18 @@
+/*
+ * Self-hosted Fonts — KEIN Google-Fonts-CDN (Datenschutz + Performance).
+ *
+ * Beide Schriften werden als VARIABLE Fonts über die @fontsource-variable-Pakete
+ * eingebunden. Vite/Astro bündelt dabei die lokalen .woff2-Dateien aus node_modules
+ * in den Build — es geht KEIN Request an fonts.googleapis.com / fonts.gstatic.com.
+ * Der Smoke-Test (tests/e2e/smoke.spec.ts) prüft genau das per Netzwerk-Mitschnitt.
+ *
+ * Variable Schnitte:
+ *  - Bricolage Grotesque Variable  -> Display/Headlines (wght-Achse, ein File für alle Gewichte)
+ *  - Inter Variable                -> Fließtext (wght-Achse)
+ *
+ * Die font-family-Namen ('… Variable') werden in tokens.css auf --font-display /
+ * --font-body gemappt; im restlichen CSS immer die Tokens verwenden, nie die Rohnamen.
+ */
+
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/inter";

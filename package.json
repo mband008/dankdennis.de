@@ -1,0 +1,32 @@
+{
+  "name": "dankdennis.de",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Persönliche One-Page-Visitenkarte für Dennis (Tischler & Feldspieler).",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check && prettier --check . && astro build",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "verify": "npm run check && npm run test",
+    "prepare": "git config core.hooksPath .githooks"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.0.0",
+    "@fontsource-variable/inter": "^5.0.0",
+    "astro": "^5.0.0",
+    "canvas-confetti": "^1.9.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@playwright/test": "^1.50.0",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^26.0.0",
+    "prettier": "^3.4.2",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^5.7.3"
+  }
+}

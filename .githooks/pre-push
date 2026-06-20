@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+#
+# pre-push — nativer git-Hook (aktiviert via core.hooksPath=.githooks; siehe package.json
+# "prepare"). Das HARTE Test-Gate vor Produktion.
+#
+# Coolify deployt bei Push auf `main`. Damit dort nie etwas Rotes landet, erzwingt dieser
+# Hook `npm run verify` (astro check + prettier + build + Playwright) — aber NUR, wenn
+# tatsächlich `refs/heads/main` aktualisiert wird. Schlägt verify fehl -> Push abgebrochen.
+#
+# Feature-Branch-Pushes laufen ungebremst durch (kein verify). Branch-Löschungen ebenso.
+#
+# Aufruf durch git:  pre-push <remote-name> <remote-url>
+# stdin je Ref:      <local ref> <local sha> <remote ref> <remote sha>
+
+set -euo pipefail
+
+PROTECTED_REF="refs/heads/main"
+ZERO_SHA="0000000000000000000000000000000000000000"
+
+push_to_main=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  # Leere Zeile / nichts zu pushen
+  [ -z "${remote_ref:-}" ] && continue
+  # Branch-Löschung (local_sha = 0…0): kein verify nötig
+  [ "${local_sha:-$ZERO_SHA}" = "$ZERO_SHA" ] && continue
+  if [ "$remote_ref" = "$PROTECTED_REF" ]; then
+    push_to_main=1
+  fi
+done
+
+if [ "$push_to_main" -eq 0 ]; then
+  exit 0
+fi
+
+echo "▶ pre-push: Push auf 'main' erkannt — Test-Gate läuft: npm run verify"
+if npm run verify; then
+  echo "✓ pre-push: verify grün — Push auf 'main' wird zugelassen."
+  exit 0
+else
+  echo "" >&2
+  echo "🚫 pre-push: 'npm run verify' ist ROT — Push auf 'main' ABGEBROCHEN." >&2
+  echo "   main muss immer grün sein (Coolify deployt von hier). Erst Fehler fixen, dann erneut pushen." >&2
+  exit 1
+fi

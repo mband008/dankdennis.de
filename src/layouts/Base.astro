@@ -1,0 +1,56 @@
+---
+/**
+ * Base.astro — globales Seiten-Layout.
+ * Setzt <head> (Meta/OG, Lang), bindet self-hosted Fonts + globales CSS ein
+ * und rendert den Seiteninhalt über <slot/>.
+ *
+ * Reihenfolge der Style-Imports ist wichtig:
+ *   fonts.css  -> @font-face (self-hosted, kein CDN)
+ *   tokens.css -> Custom Properties (Quelle der Wahrheit)
+ *   global.css -> Reset/Layout/Motion, nutzt die Tokens
+ */
+import "../styles/fonts.css";
+import "../styles/tokens.css";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Dank Dennis — Tischler & Feldspieler",
+  description = "Problem? Dank Dennis. Die persönliche Visitenkarte von Dennis: gelernter Tischler im Ladenbau und Feldspieler bei ASG Vorwärts Dessau.",
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Platzhalter-Favicon (Marken-SVG). Vollständiges Favicon/OG-Image folgt in M11. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph (OG-Image folgt in M11/Polish) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="de_DE" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#c81e1e" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
