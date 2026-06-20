@@ -1,0 +1,42 @@
+---
+/**
+ * index.astro — die One-Page.
+ * In M0 bewusst minimal: nur das getokente Grundgerüst, damit Fundament, Fonts und
+ * Tests greifen. Die echten Sektionen (Hero, Über, Werkstatt, Fußball, Counter,
+ * Kontakt, Footer) folgen ab M1 als eigene Komponenten — s. ROADMAP.md.
+ */
+import Base from "../layouts/Base.astro";
+---
+
+<Base>
+  <main class="container section">
+    <p class="kicker">dankdennis.de</p>
+    <h1>Problem? Dank Dennis.</h1>
+    <p class="lead">
+      Fundament steht — die Sektionen kommen Schritt für Schritt (siehe
+      ROADMAP.md).
+    </p>
+  </main>
+</Base>
+
+<style>
+  .kicker {
+    font-family: var(--font-display);
+    font-weight: var(--fw-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    font-size: var(--fs-100);
+  }
+
+  h1 {
+    font-size: var(--fs-600);
+    font-weight: var(--fw-black);
+    margin-block: var(--space-md) var(--space-lg);
+  }
+
+  .lead {
+    font-size: var(--fs-300);
+    color: color-mix(in srgb, var(--color-text) 80%, transparent);
+  }
+</style>
