@@ -85,4 +85,12 @@
   --motion-slow: 600ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  /* ---- Scroll-Reveal (M11) ---- */
+  /* Startversatz + Staffelung für sanfte Reveals beim Reinscrollen. Dauer/Easing kommen
+     aus den Motion-Tokens oben; diese hier steuern Distanz und zeitlichen Versatz.
+     Greifen nur unter html.js-reveal + prefers-reduced-motion: no-preference (global.css). */
+  --reveal-shift: 16px; /* translateY-Startversatz (Inhalt steigt minimal hoch) */
+  --reveal-stage: 120ms; /* Versatz Überschrift → Inhalt (zweistufig je Sektion) */
+  --reveal-stagger: 80ms; /* Versatz pro Galeriebild (nacheinander) */
 }

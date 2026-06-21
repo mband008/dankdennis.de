@@ -147,6 +147,34 @@ p {
   outline-offset: 2px;
 }
 
+/* ---------- Scroll-Reveal (M11) ---------- *
+ * Sanftes Einblenden beim Reinscrollen. Wiederverwendbarer Mechanismus: Elemente tragen
+ * [data-reveal]; src/scripts/reveal.ts setzt per IntersectionObserver einmalig .is-visible.
+ *
+ * Progressive Enhancement (nicht verhandelbar): Der versteckte Startzustand greift NUR,
+ * wenn (a) JS läuft → html.js-reveal ist gesetzt (per Feature-Detection in Base.astro) UND
+ * (b) prefers-reduced-motion: no-preference. Fällt JS aus, ist Bewegung reduziert oder läuft
+ * das Reveal nicht durch (reveal-all-Fallback in reveal.ts), greift dieser Block nie →
+ * Inhalt ist sofort vollständig sichtbar. Distanz/Versatz aus den Reveal-Tokens, Dauer/
+ * Easing aus den Motion-Tokens (die bei reduce ohnehin auf 0 stehen).
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal [data-reveal] {
+    opacity: 0;
+    transform: translateY(var(--reveal-shift));
+    transition:
+      opacity var(--motion-slow) var(--ease-out),
+      transform var(--motion-slow) var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .js-reveal [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---------- Motion / prefers-reduced-motion ---------- *
  * Verbindliche Regel (CLAUDE.md): Wer `reduce` einstellt, bekommt keine störenden
  * Animationen. Wir neutralisieren global die Motion-Tokens UND killen Transitions/
