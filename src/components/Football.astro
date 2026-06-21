@@ -33,9 +33,9 @@ const shots = [
 <section id="fussball" class="section tone-sport football">
   <div class="container">
     <div class="football__intro">
-      <p class="kicker">ASG Vorwärts Dessau</p>
-      <h2>Abseits der Werkstatt</h2>
-      <p>
+      <p class="kicker" data-reveal>ASG Vorwärts Dessau</p>
+      <h2 data-reveal>Abseits der Werkstatt</h2>
+      <p data-reveal style="--reveal-delay: var(--reveal-stage)">
         Wenn ich nicht gerade säge, findet man mich auf dem Platz – im roten
         Trikot der ASG Vorwärts Dessau. Fußball ist für mich Kopf-frei-Kriegen
         und Teamgeist pur: Man verlässt sich aufeinander, jeder gibt alles, und
@@ -46,8 +46,12 @@ const shots = [
 
     <div class="football__gallery">
       {
-        shots.map(({ img, alt }) => (
-          <figure class="football__item">
+        shots.map(({ img, alt }, i) => (
+          <figure
+            class="football__item"
+            data-reveal
+            style={`--reveal-delay: calc(var(--reveal-stagger) * ${i})`}
+          >
             <Picture
               src={img}
               formats={["avif", "webp"]}

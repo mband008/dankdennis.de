@@ -12,8 +12,14 @@ const year = new Date().getFullYear();
 
 <footer id="footer" class="section tone-wood footer">
   <div class="container footer__inner">
-    <p class="footer__line">Dank Dennis · {year}</p>
-    <button type="button" class="footer__egg" data-confetti>
+    <p class="footer__line" data-reveal>Dank Dennis · {year}</p>
+    <button
+      type="button"
+      class="footer__egg"
+      data-confetti
+      data-reveal
+      style="--reveal-delay: var(--reveal-stage)"
+    >
       Noch ein Dank? 🎉
     </button>
   </div>

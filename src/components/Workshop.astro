@@ -32,8 +32,8 @@ const shots = [
 <section id="werkstatt" class="section tone-wood workshop">
   <div class="container">
     <div class="workshop__intro">
-      <h2>In der Werkstatt</h2>
-      <p>
+      <h2 data-reveal>In der Werkstatt</h2>
+      <p data-reveal style="--reveal-delay: var(--reveal-stage)">
         Vom groben Zuschnitt bis zur sauberen Verbindung: Präzision ist für mich
         kein Extra, sondern der Standard. Was ich anpacke, soll funktionieren –
         und gut aussehen.
@@ -42,8 +42,12 @@ const shots = [
 
     <div class="workshop__gallery">
       {
-        shots.map(({ img, alt }) => (
-          <figure class="workshop__item">
+        shots.map(({ img, alt }, i) => (
+          <figure
+            class="workshop__item"
+            data-reveal
+            style={`--reveal-delay: calc(var(--reveal-stagger) * ${i})`}
+          >
             <Picture
               src={img}
               formats={["avif", "webp"]}

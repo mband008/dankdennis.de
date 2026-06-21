@@ -57,7 +57,7 @@ const isExternal = (href: string) => href.startsWith("http");
 
 <section id="kontakt" class="section tone-warm contact">
   <div class="container contact__inner">
-    <figure class="contact__media">
+    <figure class="contact__media" data-reveal>
       <Picture
         src={heartImg}
         formats={["avif", "webp"]}
@@ -67,13 +67,22 @@ const isExternal = (href: string) => href.startsWith("http");
         loading="lazy"
       />
     </figure>
-    <h2>Sag Hallo</h2>
-    <p class="contact__lead">
+    <h2 data-reveal>Sag Hallo</h2>
+    <p
+      class="contact__lead"
+      data-reveal
+      style="--reveal-delay: var(--reveal-stage)"
+    >
       Lust auf einen Plausch, eine Zusammenarbeit – oder willst du einfach mal
       Danke sagen? Meld dich.
     </p>
 
-    <ul class="contact__list" role="list">
+    <ul
+      class="contact__list"
+      role="list"
+      data-reveal
+      style="--reveal-delay: var(--reveal-stage)"
+    >
       {
         contacts.map(({ label, brand, href }) => {
           const klass = `contact__btn contact__btn--${brand}`;

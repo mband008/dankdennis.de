@@ -17,21 +17,25 @@ import aboutImg from "../assets/images/Dennis_Carp_neutral_cam.png";
 <section id="ueber" class="section tone-warm about">
   <div class="container about__grid">
     <div class="about__text">
-      <h2>Hi, ich bin Dennis.</h2>
-      <p>
+      <h2 data-reveal>Hi, ich bin Dennis.</h2>
+      <p data-reveal style="--reveal-delay: var(--reveal-stage)">
         Gelernter Tischler, im Hauptberuf Teil eines Schreiner-Teams im Ladenbau
         – wir bauen die Einrichtungen, die du später in Geschäften
         wiederfindest. Ich mag den Moment, in dem aus Holz und einer Idee etwas
         Echtes wird, das hält.
       </p>
-      <p>
+      <p data-reveal style="--reveal-delay: var(--reveal-stage)">
         Der Name dieser Seite? Ein alter Insider: Immer wenn irgendwo ein
         Problem gelöst war, hieß es „Dank Dennis". Irgendwann lag die Domain
         dazu auf dem Tisch – jetzt steht eben was drauf.
       </p>
     </div>
 
-    <figure class="about__media">
+    <figure
+      class="about__media"
+      data-reveal
+      style="--reveal-delay: var(--reveal-stage)"
+    >
       <Picture
         src={aboutImg}
         formats={["avif", "webp"]}
