@@ -1,21 +1,57 @@
 ---
 /**
  * Footer.astro — Sektion 7.
- * M1: schlichter Footer mit dynamischem Jahr. Optionales Konfetti-Easter-Egg
- * folgt in M9. Tonzone: warm/holzig (dunkel) — ruhiger Abschluss.
+ * M1: schlichter Footer mit dynamischem Jahr.
+ * M9: kleine Konfetti-Reprise als Easter-Egg — der Button trägt data-confetti und wird
+ * vom globalen Handler (src/scripts/confetti.ts, via Hero eingebunden) automatisch
+ * gebunden. prefers-reduced-motion: reduce → kein Konfetti (in confetti.ts geregelt).
+ * Tonzone: warm/holzig (dunkel) — ruhiger Abschluss.
  */
 const year = new Date().getFullYear();
 ---
 
-<footer id="footer" class="section tone-wood">
-  <div class="container">
+<footer id="footer" class="section tone-wood footer">
+  <div class="container footer__inner">
     <p class="footer__line">Dank Dennis · {year}</p>
+    <button type="button" class="footer__egg" data-confetti>
+      Noch ein Dank? 🎉
+    </button>
   </div>
 </footer>
 
 <style>
+  .footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
   .footer__line {
     font-family: var(--font-display);
     font-weight: var(--fw-bold);
+  }
+
+  /* Kleiner Ghost-Button (Reprise des Hero-CTA), dezent auf dunklem Grund. */
+  .footer__egg {
+    font-family: var(--font-body);
+    font-size: var(--fs-100);
+    color: inherit;
+    background-color: transparent;
+    border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+    border-radius: var(--radius-pill);
+    padding: var(--space-2xs) var(--space-md);
+    transition:
+      border-color var(--motion-fast) var(--ease-standard),
+      color var(--motion-fast) var(--ease-standard),
+      transform var(--motion-fast) var(--ease-standard);
+  }
+
+  .footer__egg:hover,
+  .footer__egg:focus-visible {
+    color: var(--color-accent); /* Gelb auf dunklem Grund (tone-wood) */
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
   }
 </style>
