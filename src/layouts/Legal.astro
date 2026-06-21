@@ -1,0 +1,33 @@
+---
+/**
+ * Legal.astro — Layout für die Rechtsseiten (Impressum, Datenschutz, M15).
+ * Wird von den .md-Seiten via `layout`-Frontmatter genutzt; der gerenderte
+ * Markdown-Inhalt landet im <slot/>. Wrappt Base (Head/Meta/Footer) und ergänzt:
+ *  - seitenspezifischen <title>/<description> aus dem Frontmatter,
+ *  - meta robots `noindex, follow` (Rechtsseiten gehören nicht in den Index),
+ *  - „← Zur Startseite"-Link oben,
+ *  - ruhige Fließtext-Typografie über `.prose` (Regeln in global.css),
+ *  - Footer ohne Konfetti-Egg (der Handler wird via Hero geladen, den es hier
+ *    nicht gibt — ein toter Button wäre schlechter als kein Button).
+ * Inhalt im <main>-Landmark (A11y); h1 kommt aus dem Markdown.
+ */
+import Base from "./Base.astro";
+
+const { frontmatter } = Astro.props;
+---
+
+<Base
+  title={frontmatter.title}
+  description={frontmatter.description}
+  noindex={true}
+  footerEgg={false}
+>
+  <main id="main" class="section tone-warm legal">
+    <div class="container legal__inner">
+      <a href="/" class="legal__back">← Zur Startseite</a>
+      <article class="prose">
+        <slot />
+      </article>
+    </div>
+  </main>
+</Base>

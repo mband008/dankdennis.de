@@ -4,6 +4,8 @@
  * M1: alle 7 Sektionen als leere Komponenten in der docs-Reihenfolge zusammengesetzt
  * (Hero → Über → Werkstatt → Fußball → Counter → Kontakt → Footer). Inhalte, Bilder und
  * Interaktionen folgen je Meilenstein (M2–M9). Tonzonen sind in den Komponenten gesetzt.
+ * M15: der Footer lebt jetzt global im Base-Layout (auf jeder Seite) — hier nur noch der
+ * One-Page-Inhalt + der Share-Dialog.
  */
 import Base from "../layouts/Base.astro";
 import Hero from "../components/Hero.astro";
@@ -12,7 +14,6 @@ import Workshop from "../components/Workshop.astro";
 import Football from "../components/Football.astro";
 import Counter from "../components/Counter.astro";
 import Contact from "../components/Contact.astro";
-import Footer from "../components/Footer.astro";
 import Share from "../components/Share.astro";
 ---
 
@@ -25,6 +26,5 @@ import Share from "../components/Share.astro";
     <Counter />
     <Contact />
   </main>
-  <Footer />
   <Share />
 </Base>

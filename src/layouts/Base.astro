@@ -12,15 +12,22 @@
 import "../styles/fonts.css";
 import "../styles/tokens.css";
 import "../styles/global.css";
+import Footer from "../components/Footer.astro";
 
 interface Props {
   title?: string;
   description?: string;
+  /** Rechtsseiten u. Ä. aus dem Index halten: meta robots `noindex, follow`. */
+  noindex?: boolean;
+  /** Konfetti-Egg im Footer zeigen? Aus, wo der Konfetti-Handler (via Hero) fehlt. */
+  footerEgg?: boolean;
 }
 
 const {
   title = "Dank Dennis — Tischler & Feldspieler",
   description = "Problem? Dank Dennis. Die persönliche Visitenkarte von Dennis: gelernter Tischler im Ladenbau und Feldspieler bei ASG Vorwärts Dessau.",
+  noindex = false,
+  footerEgg = true,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -55,6 +62,7 @@ const ogImageAlt =
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -83,6 +91,7 @@ const ogImageAlt =
          Visuell versteckt bis :focus (Tastatur). -->
     <a href="#main" class="skip-link">Zum Inhalt springen</a>
     <slot />
+    <Footer egg={footerEgg} />
 
     <script>
       // Scroll-Reveal-Mechanismus (M11): IntersectionObserver setzt einmalig .is-visible auf
