@@ -1,14 +1,116 @@
 ---
 /**
  * Football.astro — Sektion 4 „Abseits der Werkstatt" (Fußball).
- * M1: leeres Grundgerüst. Dynamisches Bild + Text aus docs folgen in M6.
+ * M6: Split-Layout (Text links, dynamisches Platzhalterbild rechts; mobil Bild oben).
+ * Heading + Text aus docs/dankdennis_bauplan.md §4. Das Bild (foto3 = Feldspieler-Action)
+ * ist als „dynamischer Hingucker" leicht gekippt und liegt auf einer Gelb-Akzentkarte.
  * Tonzone: rot/gelb (ASG Vorwärts Dessau) — der klar abgegrenzte Sport-Block.
+ *
+ * Der Kipp-Winkel ist ein statischer Transform (keine Animation) → reduced-motion-neutral.
+ * Das Bild ist eine CSS-Platzhalter-Box; echtes foto3 folgt gebündelt in M10 (Skill add-photo).
  */
 ---
 
-<section id="fussball" class="section tone-sport">
-  <div class="container">
-    <h2>Abseits der Werkstatt</h2>
-    <p class="placeholder-note">Fußball — Inhalt folgt (M6)</p>
+<section id="fussball" class="section tone-sport football">
+  <div class="container football__grid">
+    <div class="football__text">
+      <p class="kicker">ASG Vorwärts Dessau</p>
+      <h2>Abseits der Werkstatt</h2>
+      <p>
+        Wenn ich nicht gerade säge, findet man mich auf dem Platz – im roten
+        Trikot der ASG Vorwärts Dessau. Fußball ist für mich Kopf-frei-Kriegen
+        und Teamgeist pur: Man verlässt sich aufeinander, jeder gibt alles, und
+        am Ende zählt, was die Mannschaft schafft. Genau die Einstellung nehme
+        ich mit in die Werkstatt.
+      </p>
+    </div>
+
+    <figure class="football__media" aria-hidden="true">
+      <div class="football__placeholder">
+        <span>Foto 3 — Feldspieler-Action</span>
+      </div>
+    </figure>
   </div>
 </section>
+
+<style>
+  .football__grid {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+
+  /* Desktop: zwei Spalten, Text links / Bild rechts. */
+  @media (min-width: 48rem) {
+    .football__grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: var(--space-2xl);
+    }
+  }
+
+  .kicker {
+    font-family: var(--font-display);
+    font-weight: var(--fw-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent); /* Gelb auf rotem Grund (tone-sport) */
+    font-size: var(--fs-100);
+    margin-bottom: var(--space-xs);
+  }
+
+  .football__text p:not(.kicker) {
+    font-size: var(--fs-300);
+    margin-top: var(--space-md);
+  }
+
+  /* Dynamischer Hingucker: gekipptes Bild auf einer Gelb-Akzentkarte. */
+  .football__media {
+    position: relative;
+    margin: 0;
+    isolation: isolate;
+  }
+
+  .football__placeholder {
+    aspect-ratio: 3 / 4;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    transform: rotate(-3deg);
+    background:
+      repeating-linear-gradient(
+        135deg,
+        color-mix(in srgb, currentColor 10%, transparent) 0,
+        color-mix(in srgb, currentColor 10%, transparent) 2px,
+        transparent 2px,
+        transparent 14px
+      ),
+      color-mix(in srgb, currentColor 6%, transparent);
+    border: 2px dashed color-mix(in srgb, currentColor 28%, transparent);
+  }
+
+  /* Gelb-Akzentkarte hinter dem Bild (entgegengesetzt gekippt → Tiefe). */
+  .football__media::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: var(--radius-md);
+    background-color: var(--color-yellow);
+    transform: rotate(3deg);
+  }
+
+  .football__placeholder span {
+    font-size: var(--fs-100);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 60%, transparent);
+  }
+
+  /* Mobil: Bild über den Text holen. */
+  @media (max-width: 47.999rem) {
+    .football__media {
+      order: -1;
+      margin-bottom: var(--space-md);
+    }
+  }
+</style>
