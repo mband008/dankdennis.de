@@ -20,6 +20,20 @@ test("Footer zeigt Dank Dennis mit dynamischem Jahr", async ({ page }) => {
   );
 });
 
+test("Credit-Zeile nennt Michael Banditt mit Link auf seine Seite", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const credit = page.locator("#footer .footer__credit");
+  await expect(credit).toContainText("Made with");
+  await expect(credit).toContainText("für seinen geliebten Bruder");
+
+  const link = credit.getByRole("link", { name: "Michael Banditt" });
+  await expect(link).toHaveAttribute("href", "https://michaelbanditt.de");
+  await expect(link).toHaveAttribute("rel", /noopener/);
+});
+
 test("Easter-Egg-Button löst Konfetti aus", async ({ page }) => {
   await page.goto("/");
 
