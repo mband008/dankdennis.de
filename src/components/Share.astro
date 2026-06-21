@@ -1,0 +1,387 @@
+---
+/**
+ * Share.astro — Teilen-Dialog (M14).
+ *
+ * Natives <dialog> (showModal), getriggert vom Hero-CTA „Dank Dennis!" (data-share).
+ * Beim Öffnen feuert src/scripts/share.ts einen Konfetti-Burst (im Top-Layer, damit er
+ * ÜBER dem Modal sichtbar ist) — bei prefers-reduced-motion: reduce ohne Konfetti und
+ * ohne Bewegungs-Transition (zentrale Regeln in global.css greifen zusätzlich).
+ *
+ * Inhalt:
+ *  - editierbares <textarea> (Preset-Spruch) → speist alle textfähigen Kanäle live.
+ *  - feste Netzwerk-Buttons (E-Mail/WhatsApp/X/Telegram/Facebook) → reine Outbound-URLs,
+ *    in neuem Tab via window.open('…','noopener,noreferrer'). KEINE Third-Party-SDKs.
+ *  - „Text kopieren" (Clipboard + Fallback) und nativer Teilen-Button (Web Share API,
+ *    nur sichtbar wenn navigator.share existiert — share.ts blendet ihn ein).
+ *  - Daumen-hoch-Share-Bild: Anzeige optimiert via astro:assets; Download als JPG aus
+ *    public/share/ (AVIF/WebP werden von Ziel-Apps oft nicht akzeptiert).
+ *
+ * A11y: aria-labelledby (Titel), <label> fürs Textfeld, Icon-Buttons mit aria-label,
+ * Schließen via Esc (nativ), Backdrop-Klick und ✕-Button; Fokus zurück auf den Trigger
+ * (in share.ts). „null externe Requests" bleibt erhalten — bis der Nutzer klickt.
+ */
+import { Picture } from "astro:assets";
+import shareImg from "../assets/images/_spare/Dennis_neutral_thumb_up_closer.png";
+
+type Brand = "email" | "whatsapp" | "x" | "telegram" | "facebook";
+
+interface Network {
+  key: Brand;
+  label: string;
+}
+
+// SVG-Pfade (viewBox 0 0 24 24). E-Mail (Material) + Simple Icons (CC0): WhatsApp, X,
+// Telegram, Facebook. Inline & self-hosted → kein externer Request.
+const ICONS: Record<Brand, string> = {
+  email:
+    "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z",
+  whatsapp:
+    "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z",
+  x: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z",
+  telegram:
+    "M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z",
+  facebook:
+    "M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z",
+};
+
+const networks: Network[] = [
+  { key: "email", label: "Per E-Mail teilen" },
+  { key: "whatsapp", label: "Bei WhatsApp teilen" },
+  { key: "x", label: "Auf X teilen" },
+  { key: "telegram", label: "Bei Telegram teilen" },
+  { key: "facebook", label: "Bei Facebook teilen" },
+];
+
+// Preset-Spruch (Quelle der Wahrheit für die Vorbefüllung). Der editierte Text speist
+// danach alle textfähigen Kanäle (E-Mail/WhatsApp/X/Telegram + Clipboard + Web Share).
+const PRESET = "Wieder ein Problem gelöst. Dank Dennis! #dankdennis";
+
+// Herunterladbares Share-Bild (JPG): bewusst aus public/ (NICHT astro:assets), weil
+// Ziel-Apps AVIF/WebP oft ablehnen. Web Share lädt dieselbe Datei per fetch (share.ts).
+const SHARE_IMG = "/share/dank-dennis.jpg";
+---
+
+<dialog
+  id="share-dialog"
+  class="share"
+  aria-labelledby="share-title"
+  data-share-img={SHARE_IMG}
+>
+  <div class="share__card">
+    <form method="dialog" class="share__close-form">
+      <button type="submit" class="share__close" aria-label="Dialog schließen">
+        ✕
+      </button>
+    </form>
+
+    <h2 id="share-title" class="share__title">Sag's weiter 🎉</h2>
+
+    <figure class="share__media">
+      <Picture
+        src={shareImg}
+        formats={["avif", "webp"]}
+        alt="Dennis zeigt grinsend den Daumen hoch"
+        widths={[180, 360]}
+        sizes="180px"
+        loading="lazy"
+      />
+    </figure>
+
+    <p class="share__lead">
+      Dennis hat dir geholfen? Teil den Dank – Spruch anpassen und los:
+    </p>
+
+    <label class="share__label" for="share-text">Dein Spruch</label>
+    <textarea id="share-text" class="share__text" rows="3" data-share-text
+      >{PRESET}</textarea
+    >
+
+    <ul class="share__networks" role="list">
+      {
+        networks.map(({ key, label }) => (
+          <li>
+            <button
+              type="button"
+              class={`share__net share__net--${key}`}
+              data-share-net={key}
+              aria-label={label}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d={ICONS[key]} />
+              </svg>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="share__actions">
+      <button type="button" class="share__action" data-share-copy>
+        <span class="share__action-label">Text kopieren</span>
+      </button>
+      <a class="share__action share__action--link" href={SHARE_IMG} download>
+        Bild herunterladen
+      </a>
+      <button
+        type="button"
+        class="share__action share__action--native"
+        data-share-native
+        hidden
+      >
+        Mehr …
+      </button>
+    </div>
+
+    <p
+      class="share__feedback"
+      data-share-feedback
+      role="status"
+      aria-live="polite"
+    >
+    </p>
+  </div>
+</dialog>
+
+<style>
+  /* Top-Layer-Element → eigene, on-brand Optik (warmer Grund, rote Akzente). */
+  .share {
+    width: min(92vw, 30rem);
+    max-height: 90vh;
+    /* Zentrieren: das globale Reset (* { margin: 0 }) überschreibt das UA-margin:auto
+       des <dialog> → hier wiederherstellen, sonst klebt der Modal oben links. */
+    margin: auto;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text);
+    overflow: visible;
+  }
+
+  .share::backdrop {
+    /* Espresso-Schleier aus dem Marken-Token. */
+    background-color: color-mix(in srgb, var(--bg-dark) 70%, transparent);
+  }
+
+  .share__card {
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: var(--space-xl);
+    background: var(--bg);
+    border-radius: var(--radius-md);
+    box-shadow: 0 24px 60px -18px
+      color-mix(in srgb, var(--bg-dark) 55%, transparent);
+    text-align: center;
+  }
+
+  .share__close-form {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    margin: 0;
+  }
+
+  .share__close {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    font-size: var(--fs-200);
+    line-height: 1;
+    color: var(--text);
+    background-color: transparent;
+    border: none;
+    border-radius: var(--radius-pill);
+    transition: background-color var(--motion-fast) var(--ease-standard);
+  }
+
+  .share__close:hover,
+  .share__close:focus-visible {
+    background-color: color-mix(in srgb, var(--color-red) 14%, transparent);
+  }
+
+  .share__title {
+    font-size: var(--fs-400);
+    margin-bottom: var(--space-md);
+  }
+
+  .share__media {
+    margin: 0 auto var(--space-md);
+    width: clamp(6rem, 5rem + 8vw, 9rem);
+  }
+
+  .share__media :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 24px -12px
+      color-mix(in srgb, var(--bg-dark) 45%, transparent);
+  }
+
+  .share__lead {
+    margin: 0 auto var(--space-md);
+    font-size: var(--fs-200);
+    color: color-mix(in srgb, currentColor 80%, transparent);
+  }
+
+  .share__label {
+    display: block;
+    text-align: left;
+    font-family: var(--font-display);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-100);
+    margin-bottom: var(--space-2xs);
+  }
+
+  .share__text {
+    width: 100%;
+    resize: vertical;
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-body);
+    font-size: var(--fs-200);
+    color: var(--text);
+    background-color: var(--bg);
+    border: 2px solid color-mix(in srgb, var(--text) 22%, transparent);
+    border-radius: var(--radius-sm);
+  }
+
+  .share__text:focus-visible {
+    border-color: var(--color-red);
+    outline: none;
+  }
+
+  .share__networks {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-lg) 0 var(--space-md);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+  }
+
+  /* Runde Icon-Buttons; --brand wird je Plattform gesetzt (Default: Akzent). */
+  .share__net {
+    --brand: var(--color-accent);
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    background-color: transparent;
+    border: 2px solid var(--brand);
+    border-radius: var(--radius-pill);
+    transition:
+      background-color var(--motion-fast) var(--ease-standard),
+      transform var(--motion-fast) var(--ease-standard);
+  }
+
+  .share__net svg {
+    width: 1.3em;
+    height: 1.3em;
+    fill: var(--brand);
+    transition: fill var(--motion-fast) var(--ease-standard);
+  }
+
+  .share__net:hover,
+  .share__net:focus-visible {
+    background-color: var(--brand);
+    transform: translateY(-2px);
+  }
+
+  .share__net:hover svg,
+  .share__net:focus-visible svg {
+    fill: var(--text-on-dark);
+  }
+
+  .share__net--email {
+    --brand: var(--brand-email);
+  }
+  .share__net--whatsapp {
+    --brand: var(--brand-whatsapp);
+  }
+  .share__net--x {
+    --brand: var(--brand-x);
+  }
+  .share__net--telegram {
+    --brand: var(--brand-telegram);
+  }
+  .share__net--facebook {
+    --brand: var(--brand-facebook);
+  }
+
+  .share__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+  }
+
+  .share__action {
+    font-family: var(--font-display);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-100);
+    text-decoration: none;
+    color: var(--text);
+    background-color: transparent;
+    border: 2px solid color-mix(in srgb, var(--text) 22%, transparent);
+    border-radius: var(--radius-pill);
+    padding: var(--space-xs) var(--space-md);
+    transition:
+      border-color var(--motion-fast) var(--ease-standard),
+      color var(--motion-fast) var(--ease-standard),
+      transform var(--motion-fast) var(--ease-standard);
+  }
+
+  .share__action:hover,
+  .share__action:focus-visible {
+    border-color: var(--color-red);
+    color: var(--color-red);
+    transform: translateY(-2px);
+  }
+
+  .share__feedback {
+    min-height: 1.25rem;
+    margin: var(--space-sm) 0 0;
+    font-size: var(--fs-100);
+    font-weight: var(--fw-bold);
+    color: var(--color-red);
+  }
+
+  /* Öffnen-Animation NUR mit erlaubter Bewegung (reduce-Pfad bleibt ohne Transition).
+     global.css killt Animationen unter reduce zusätzlich als Sicherheitsnetz.
+     Wichtig: die Bewegung (transform) sitzt auf der KARTE, nicht auf dem <dialog>.
+     Ein transform auf dem Dialog würde einen Containing-Block bilden und das
+     position:fixed-Konfetti-Canvas (Top-Layer) verzerren/beschneiden. */
+  @media (prefers-reduced-motion: no-preference) {
+    .share[open] {
+      animation: share-fade var(--motion-base) var(--ease-out);
+    }
+    .share[open]::backdrop {
+      animation: share-fade var(--motion-base) var(--ease-out);
+    }
+    .share[open] .share__card {
+      animation: share-in var(--motion-base) var(--ease-out);
+    }
+  }
+
+  @keyframes share-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+
+  @keyframes share-fade {
+    from {
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  // Client-Logik (M14): Öffnen/Schließen, Konfetti-Burst beim Öffnen, Netzwerk-URLs,
+  // Clipboard und Web Share. Astro bündelt das Modul client-seitig.
+  import "../scripts/share.ts";
+</script>

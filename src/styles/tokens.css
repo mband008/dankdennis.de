@@ -38,6 +38,10 @@
   );
   --brand-linkedin: #0a66c2;
   --brand-whatsapp: #25d366;
+  /* Teilen-Dialog (M14): weitere Plattform-Farben (Simple-Icons-Brandwerte). */
+  --brand-x: #000000; /* X (vormals Twitter) */
+  --brand-telegram: #26a5e4;
+  --brand-facebook: #1877f2;
 
   /* ---- Typografie ---- */
   --font-display: "Bricolage Grotesque Variable", system-ui, sans-serif;
