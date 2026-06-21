@@ -24,51 +24,51 @@ Status-Legende: ✅ erledigt · 🔜 als Nächstes · ⬜ offen
   **DoD:** Alle Sektionen in korrekter Reihenfolge sichtbar, responsive Container steht,
   Test prüft Vorhandensein aller Section-Anker.
 
-- **M2 — Hero** 🔜 _(→ M1)_
+- **M2 — Hero** ✅ _(→ M1)_
   Split-Layout (Text links, Platzhalterbild rechts; mobil Bild oben). Headline
   „Problem? Dank Dennis.", Untertitel, Button „Dank Dennis!" (ohne Konfetti-Logik noch).
   **DoD:** Hero responsive korrekt, Headline/Untertitel/Button im Test vorhanden.
 
-- **M3 — Konfetti-Interaktion** ⬜ _(→ M2)_
+- **M3 — Konfetti-Interaktion** ✅ _(→ M2)_
   `canvas-confetti` einbinden, Click-Handler in `confetti.ts`, Hinweis „(probier's aus)".
   `prefers-reduced-motion: reduce` → kein/reduziertes Konfetti.
   **DoD:** Klick löst Konfetti aus (Playwright prüft Aufruf/Canvas), kein Konsolen-Fehler;
   Test mit `reduced-motion` bestätigt, dass kein Konfetti ausgelöst wird.
 
-- **M4 — Über (Wer ist Dennis)** ⬜ _(→ M1)_
+- **M4 — Über (Wer ist Dennis)** ✅ _(→ M1)_
   Split mit Platzhalter-Porträt, Heading „Hi, ich bin Dennis." + 2 Absätze (Text aus docs).
   **DoD:** Inhalt + Layout responsive, Test grün.
 
-- **M5 — Werkstatt** ⬜ _(→ M1)_
+- **M5 — Werkstatt** ✅ _(→ M1)_
   Großes Platzhalterbild, Heading „In der Werkstatt", kurzer Text. (Galerie-fähig angelegt.)
   **DoD:** Sektion responsive, Test grün.
 
-- **M6 — Fußball (Abseits der Werkstatt)** ⬜ _(→ M1)_
+- **M6 — Fußball (Abseits der Werkstatt)** ✅ _(→ M1)_
   Rot/gelb akzentuierte Sektion, dynamisches Platzhalterbild, Heading + Text aus docs.
   **DoD:** Akzent-Tonzone korrekt, responsive, Test grün.
 
-- **M7 — Counter** ⬜ _(→ M1)_
+- **M7 — Counter** ✅ _(→ M1)_
   Scoreboard-Optik, große Zahl (z. B. 1.337), Count-Up via IntersectionObserver
   (`counter.ts`), Untertext „…und es werden täglich mehr."
   `prefers-reduced-motion: reduce` → sofort Endwert statt Hochzähl-Animation.
   **DoD:** Zahl zählt beim Reinscrollen von 0 hoch (Playwright prüft Animation/Endwert);
   Test mit `reduced-motion` bestätigt sofortigen Endwert.
 
-- **M8 — Kontakt (Sag Hallo)** ⬜ _(→ M1)_
+- **M8 — Kontakt (Sag Hallo)** ✅ _(→ M1)_
   Heading + Text, Platzhalter-Buttons (E-Mail/Instagram/LinkedIn/WhatsApp) so strukturiert,
   dass später nur Links/Adressen eingetragen werden müssen.
   **DoD:** Buttons vorhanden + als Platzhalter markiert; Struktur dokumentiert; Test grün.
 
-- **M9 — Footer & Easter-Egg** ⬜ _(→ M3)_
+- **M9 — Footer & Easter-Egg** ✅ _(→ M3)_
   „Dank Dennis · {Jahr}", optional kleiner Konfetti-Button-Reprise.
   **DoD:** Jahr dynamisch, responsive, Test grün.
 
-- **M10 — Echte Fotos einbauen** ⬜ _(→ M2/M4/M5/M6; gemeinsam mit Nutzer)_
+- **M10 — Echte Fotos einbauen** ✅ _(→ M2/M4/M5/M6; gemeinsam mit Nutzer)_
   Fotos GEMEINSAM auswählen (Skill `add-photo`), per `astro:assets` optimiert einbinden,
   Alt-Texte, `loading="lazy"` für untere Bilder.
   **DoD:** Reale Bilder optimiert ausgeliefert (WebP/srcset), Layouts stimmen mobil+Desktop.
 
-- **M11 — Scroll-Reveals (Motion)** ⬜ _(→ M4–M9; Galerien M5/M6)_
+- **M11 — Scroll-Reveals (Motion)** ✅ _(→ M4–M9; Galerien M5/M6)_
   Inhalte unter dem Fold erscheinen beim Reinscrollen sanft (opacity + minimaler translateY,
   gestaffelt Überschrift→Inhalt) für Über/Werkstatt/Fußball/Counter/Kontakt/Footer; Werkstatt-
   und Fußball-Galerie staffeln ihre Fotos nacheinander. Hero bleibt unverändert (über dem Fold).
@@ -87,7 +87,7 @@ Status-Legende: ✅ erledigt · 🔜 als Nächstes · ⬜ offen
   Cross-Viewport-Durchlauf, vollständige Playwright-Suite.
   **DoD:** Lighthouse gut (Perf/A11y/SEO), volle Test-Suite grün, keine Konsolen-Fehler.
 
-- **M13 — Deploy (Coolify)** ⬜ _(→ M12)_
+- **M13 — Deploy (Coolify)** ✅ _(→ M12)_
   Coolify-App: Static-Build `npm run build`, Publish-Dir `dist/`, Auto-Deploy-Webhook bei
   Push auf `main`, Domain `dankdennis.de` + SSL. **Merge nach `main` macht Claude lokal
   (`--no-ff`); den Push macht der Mensch.** Der `pre-push`-Hook ist das Test-Gate. Skill
