@@ -18,7 +18,13 @@
  *   - WhatsApp:  href: "https://wa.me/<nummer>"
  * Einträge mit href werden automatisch zu echten Links (target/rel für extern gesetzt),
  * solange href null ist, bleibt es ein nicht-navigierender Platzhalter.
+ *
+ * M10: dezentes Bild über „Sag Hallo" (hand_heart, „Danke sagen") via astro:assets
+ *      (<Picture>, AVIF/WebP + srcset, lazy). Foto-Zuordnung + Alt: docs/ (Foto-Plan M10).
  */
+import { Picture } from "astro:assets";
+import heartImg from "../assets/images/Dennis_neutral_hand_heart.png";
+
 type Brand = "email" | "instagram" | "linkedin" | "whatsapp";
 
 interface Contact {
@@ -51,6 +57,16 @@ const isExternal = (href: string) => href.startsWith("http");
 
 <section id="kontakt" class="section tone-warm contact">
   <div class="container contact__inner">
+    <figure class="contact__media">
+      <Picture
+        src={heartImg}
+        formats={["avif", "webp"]}
+        alt="Dennis mit der Hand auf dem Herzen, dankbare Geste"
+        widths={[200, 320, 480]}
+        sizes="200px"
+        loading="lazy"
+      />
+    </figure>
     <h2>Sag Hallo</h2>
     <p class="contact__lead">
       Lust auf einen Plausch, eine Zusammenarbeit – oder willst du einfach mal
@@ -99,6 +115,19 @@ const isExternal = (href: string) => href.startsWith("http");
     display: grid;
     justify-items: center;
     gap: var(--space-md);
+  }
+
+  /* Dezentes, rundes Porträt über der Überschrift. */
+  .contact__media {
+    margin: 0 0 var(--space-sm);
+    width: clamp(7rem, 6rem + 6vw, 11rem);
+  }
+
+  .contact__media :global(img) {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: var(--radius-pill);
   }
 
   .contact__lead {

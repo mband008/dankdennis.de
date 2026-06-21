@@ -1,14 +1,32 @@
 ---
 /**
  * Workshop.astro — Sektion 3 „In der Werkstatt".
- * M5: Intro (Heading + kurzer Text) über einer galerie-fähigen Bild-Struktur. Aktuell
- * EIN großes Platzhalterbild (foto1 = Werkstatt-Action, Querformat); später reichen
- * weitere <figure>-Items in .workshop__gallery für 2–3 Shots — keine Layout-Änderung nötig
- * (auto-fit-Grid). Text aus docs/dankdennis_bauplan.md §3.
+ * M5: Intro (Heading + kurzer Text) über einer galerie-fähigen Bild-Struktur (auto-fit-Grid).
+ * M10: vier echte Werkstatt-Action-Fotos in Prozess-Reihenfolge (zeichnen → hobeln →
+ *      zusammenfügen → schleifen) via astro:assets (<Picture>, AVIF/WebP + srcset, lazy).
+ *      Foto-Zuordnung + Alt-Texte: docs/ (Foto-Plan M10).
+ * Text aus docs/dankdennis_bauplan.md §3.
  * Tonzone: warm/holzig (dunkel/atmosphärisch — Holz, Werkstattlicht), Gelb-Akzent.
- *
- * Bilder sind CSS-Platzhalter-Boxen; echte Fotos folgen gebündelt in M10 (Skill add-photo).
  */
+import { Picture } from "astro:assets";
+import drawImg from "../assets/images/Dennis_carp_draw.png";
+import planingImg from "../assets/images/Dennis_carp_planing.png";
+import assembleImg from "../assets/images/Dennis_carp_assemble.png";
+import grindImg from "../assets/images/Dennis_carp_grind.png";
+
+// Prozess-Reihenfolge erzählt eine kleine Werkstatt-Geschichte.
+const shots = [
+  {
+    img: drawImg,
+    alt: "Dennis zeichnet mit Bleistift eine Linie auf ein Brett an",
+  },
+  { img: planingImg, alt: "Dennis hobelt ein Werkstück mit dem Handhobel" },
+  {
+    img: assembleImg,
+    alt: "Dennis fügt eine Holzbox mit Schwalbenschwanz-Verbindung",
+  },
+  { img: grindImg, alt: "Dennis schleift ein Brett mit dem Exzenterschleifer" },
+];
 ---
 
 <section id="werkstatt" class="section tone-wood workshop">
@@ -22,13 +40,21 @@
       </p>
     </div>
 
-    <!-- Galerie-fähig: weitere <figure class="workshop__item"> ergänzen (M10). -->
     <div class="workshop__gallery">
-      <figure class="workshop__item" aria-hidden="true">
-        <div class="workshop__placeholder">
-          <span>Foto 1 — Werkstatt-Action</span>
-        </div>
-      </figure>
+      {
+        shots.map(({ img, alt }) => (
+          <figure class="workshop__item">
+            <Picture
+              src={img}
+              formats={["avif", "webp"]}
+              alt={alt}
+              widths={[300, 600, 900]}
+              sizes="(min-width: 64rem) 23vw, (min-width: 40rem) 45vw, 100vw"
+              loading="lazy"
+            />
+          </figure>
+        ))
+      }
     </div>
   </div>
 </section>
@@ -46,40 +72,23 @@
     font-size: var(--fs-300);
   }
 
-  /* Galerie: ein Bild füllt die Breite (groß); mehrere wandern in Spalten. */
+  /* Galerie: Filmstrip aus vier Hochformat-Shots — 4-up auf Desktop, 2-up auf Tablet,
+     einspaltig auf Mobil (auto-fit). */
   .workshop__gallery {
     display: grid;
     gap: var(--space-lg);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
   }
 
   .workshop__item {
     margin: 0;
   }
 
-  /* Platzhalter — adaptiv über currentColor, funktioniert auf dunklem Grund.
-     Querformat (foto1 = Werkstatt-Action). Ersetzt durch echtes Bild in M10. */
-  .workshop__placeholder {
-    aspect-ratio: 3 / 2;
-    display: grid;
-    place-items: center;
+  /* Foto im Originalverhältnis 4/5 → object-fit ohne Beschnitt. */
+  .workshop__item :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
     border-radius: var(--radius-md);
-    background:
-      repeating-linear-gradient(
-        135deg,
-        color-mix(in srgb, currentColor 8%, transparent) 0,
-        color-mix(in srgb, currentColor 8%, transparent) 2px,
-        transparent 2px,
-        transparent 14px
-      ),
-      color-mix(in srgb, currentColor 4%, transparent);
-    border: 2px dashed color-mix(in srgb, currentColor 22%, transparent);
-  }
-
-  .workshop__placeholder span {
-    font-size: var(--fs-100);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 55%, transparent);
   }
 </style>

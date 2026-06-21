@@ -1,17 +1,18 @@
 ---
 /**
  * Hero.astro — Sektion 1 (Above the fold).
- * M2: Split-Layout (Text links, Platzhalterbild rechts; mobil Bild oben). Headline,
- * Untertitel und Button „Dank Dennis!".
+ * M2: Split-Layout (Text links, Bild rechts; mobil Bild oben). Headline, Untertitel,
+ * Button „Dank Dennis!".
  * M3: Der Button (data-confetti) löst per src/scripts/confetti.ts Konfetti aus; Hinweis
  * „(probier's aus)". prefers-reduced-motion: reduce → kein Konfetti.
+ * M10: echtes Foto (open_hand) via astro:assets (<Picture>, AVIF/WebP + srcset).
+ *      Above the fold → eager geladen. Foto-Zuordnung: docs/ (Foto-Plan M10).
  * Trägt die einzige <h1> der Seite. Inhalte aus docs/dankdennis_bauplan.md §1.
- * Tonzone: warm/holzig (hell).
- *
- * Das Bild ist bewusst eine CSS-Platzhalter-Box (foto1 = Werkstatt-Action, Hochformat):
- * echte Fotos werden gebündelt in M10 über astro:assets eingebaut (Skill add-photo).
- * Im DOM steht der Text zuerst (h1 früh = A11y/SEO); auf Mobil holt CSS das Bild nach oben.
+ * Tonzone: warm/holzig (hell). Im DOM steht der Text zuerst (h1 früh = A11y/SEO);
+ * auf Mobil holt CSS das Bild nach oben.
  */
+import { Picture } from "astro:assets";
+import heroImg from "../assets/images/Dennis_neutral_open_hand.png";
 ---
 
 <section id="hero" class="section tone-warm hero">
@@ -29,10 +30,16 @@
       <p class="hero__hint">(probier's aus)</p>
     </div>
 
-    <figure class="hero__media" aria-hidden="true">
-      <div class="hero__placeholder">
-        <span>Foto 1 — Werkstatt-Action</span>
-      </div>
+    <figure class="hero__media">
+      <Picture
+        src={heroImg}
+        formats={["avif", "webp"]}
+        alt="Dennis lächelt mit offener, einladender Handgeste"
+        widths={[400, 700, 1122]}
+        sizes="(min-width: 48rem) 40vw, 100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
     </figure>
   </div>
 </section>
@@ -105,43 +112,22 @@
     color: color-mix(in srgb, currentColor 55%, transparent);
   }
 
-  /* Platzhalterbild — Hochformat-Box, holziger Verlauf. Ersetzt durch echtes foto1 in M10. */
+  /* Foto (foto open_hand). Frame im Originalverhältnis 4/5 → object-fit ohne Beschnitt. */
   .hero__media {
     margin: 0;
   }
 
-  .hero__placeholder {
-    aspect-ratio: 3 / 4;
-    display: grid;
-    place-items: center;
+  .hero__media :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
     border-radius: var(--radius-md);
-    background:
-      repeating-linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--bg-dark) 10%, transparent) 0,
-        color-mix(in srgb, var(--bg-dark) 10%, transparent) 2px,
-        transparent 2px,
-        transparent 14px
-      ),
-      color-mix(in srgb, var(--bg-dark) 6%, var(--bg));
-    border: 2px dashed color-mix(in srgb, var(--bg-dark) 25%, transparent);
-  }
-
-  .hero__placeholder span {
-    font-size: var(--fs-100);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 55%, transparent);
   }
 
   /* Mobil: Bild über den Text holen (docs: „Auf dem Handy: Bild oben, Text darunter"). */
   @media (max-width: 47.999rem) {
     .hero__media {
       order: -1;
-    }
-
-    .hero__placeholder {
-      aspect-ratio: 4 / 3;
     }
   }
 </style>

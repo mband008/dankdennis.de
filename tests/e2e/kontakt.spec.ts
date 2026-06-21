@@ -43,6 +43,25 @@ test("alle vier Kontakt-Buttons sind als Platzhalter vorhanden", async ({
   await expect(page.locator("#kontakt a[href]")).toHaveCount(0);
 });
 
+test("Kontakt-Foto ist optimiert eingebunden (AVIF/WebP, srcset, Alt)", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const media = page.locator("#kontakt .contact__media");
+  await expect(media.locator("picture source[type='image/avif']")).toHaveCount(
+    1,
+  );
+  const img = media.locator("img");
+  await img.scrollIntoViewIfNeeded();
+  await expect(img).toBeVisible();
+  await expect
+    .poll(async () => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
+    .toBeGreaterThan(0);
+  expect((await img.getAttribute("alt"))?.length ?? 0).toBeGreaterThan(0);
+  expect(await img.getAttribute("srcset")).toBeTruthy();
+});
+
 test("keine Konsolen-Fehler in der Kontakt-Sektion", async ({ page }) => {
   const consoleErrors: string[] = [];
   page.on("console", (msg) => {

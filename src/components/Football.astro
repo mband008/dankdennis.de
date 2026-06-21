@@ -1,19 +1,38 @@
 ---
 /**
  * Football.astro — Sektion 4 „Abseits der Werkstatt" (Fußball).
- * M6: Split-Layout (Text links, dynamisches Platzhalterbild rechts; mobil Bild oben).
- * Heading + Text aus docs/dankdennis_bauplan.md §4. Das Bild (foto3 = Feldspieler-Action)
- * ist als „dynamischer Hingucker" leicht gekippt und liegt auf einer Gelb-Akzentkarte.
+ * M6: Text + dynamischer Bild-Hingucker (Tilt + Gelb-Akzent).
+ * M10: Umbau von Einzelbild auf eine 4er-Galerie (Zwei-Kapitel-Story: Tor → Feld),
+ *      echte Fotos via astro:assets (<Picture>, AVIF/WebP + srcset, lazy). Der verspielte
+ *      Charakter bleibt: leichter, alternierender Tilt + Gelb-Akzentrahmen (statische
+ *      Transforms → reduced-motion-neutral). Foto-Zuordnung + Alt-Texte: docs/ (Foto-Plan M10).
+ * Text aus docs/dankdennis_bauplan.md §4.
  * Tonzone: rot/gelb (ASG Vorwärts Dessau) — der klar abgegrenzte Sport-Block.
- *
- * Der Kipp-Winkel ist ein statischer Transform (keine Animation) → reduced-motion-neutral.
- * Das Bild ist eine CSS-Platzhalter-Box; echtes foto3 folgt gebündelt in M10 (Skill add-photo).
  */
+import { Picture } from "astro:assets";
+import keepingImg from "../assets/images/Dennis_fb_keeping.png";
+import gkImg from "../assets/images/Dennis_fb_gk.png";
+import strikeImg from "../assets/images/Dennis_fb_strike.png";
+import midfieldImg from "../assets/images/Dennis_fb_midfield.png";
+
+// Zwei-Kapitel-Story: erst das Tor (Aufhänger: Flugparade), dann das Feld.
+const shots = [
+  {
+    img: keepingImg,
+    alt: "Dennis hält als Torwart einen Ball, Flugparade",
+  },
+  { img: gkImg, alt: "Dennis als Torwart in Grundstellung im Tor" },
+  {
+    img: strikeImg,
+    alt: "Dennis am Ball im roten Trikot der ASG Vorwärts Dessau",
+  },
+  { img: midfieldImg, alt: "Dennis dribbelt im roten Trikot über den Platz" },
+];
 ---
 
 <section id="fussball" class="section tone-sport football">
-  <div class="container football__grid">
-    <div class="football__text">
+  <div class="container">
+    <div class="football__intro">
       <p class="kicker">ASG Vorwärts Dessau</p>
       <h2>Abseits der Werkstatt</h2>
       <p>
@@ -25,27 +44,28 @@
       </p>
     </div>
 
-    <figure class="football__media" aria-hidden="true">
-      <div class="football__placeholder">
-        <span>Foto 3 — Feldspieler-Action</span>
-      </div>
-    </figure>
+    <div class="football__gallery">
+      {
+        shots.map(({ img, alt }) => (
+          <figure class="football__item">
+            <Picture
+              src={img}
+              formats={["avif", "webp"]}
+              alt={alt}
+              widths={[300, 600, 900]}
+              sizes="(min-width: 64rem) 23vw, (min-width: 40rem) 45vw, 100vw"
+              loading="lazy"
+            />
+          </figure>
+        ))
+      }
+    </div>
   </div>
 </section>
 
 <style>
-  .football__grid {
-    display: grid;
-    gap: var(--space-xl);
-    align-items: center;
-  }
-
-  /* Desktop: zwei Spalten, Text links / Bild rechts. */
-  @media (min-width: 48rem) {
-    .football__grid {
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: var(--space-2xl);
-    }
+  .football__intro {
+    margin-bottom: var(--space-xl);
   }
 
   .kicker {
@@ -58,59 +78,40 @@
     margin-bottom: var(--space-xs);
   }
 
-  .football__text p:not(.kicker) {
+  .football__intro h2 {
+    margin-bottom: var(--space-md);
+  }
+
+  .football__intro p:not(.kicker) {
     font-size: var(--fs-300);
-    margin-top: var(--space-md);
   }
 
-  /* Dynamischer Hingucker: gekipptes Bild auf einer Gelb-Akzentkarte. */
-  .football__media {
-    position: relative;
-    margin: 0;
-    isolation: isolate;
-  }
-
-  .football__placeholder {
-    aspect-ratio: 3 / 4;
+  /* Galerie: vier Hochformat-Shots — 4-up Desktop, 2-up Tablet, einspaltig Mobil. */
+  .football__gallery {
     display: grid;
-    place-items: center;
+    gap: var(--space-lg);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  }
+
+  .football__item {
+    margin: 0;
+  }
+
+  /* Verspielter Charakter: leichter, alternierender Tilt + Gelb-Akzentrahmen.
+     Statische Transforms (keine Animation) → reduced-motion-neutral. */
+  .football__item :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
     border-radius: var(--radius-md);
-    transform: rotate(-3deg);
-    background:
-      repeating-linear-gradient(
-        135deg,
-        color-mix(in srgb, currentColor 10%, transparent) 0,
-        color-mix(in srgb, currentColor 10%, transparent) 2px,
-        transparent 2px,
-        transparent 14px
-      ),
-      color-mix(in srgb, currentColor 6%, transparent);
-    border: 2px dashed color-mix(in srgb, currentColor 28%, transparent);
+    box-shadow: 0 0 0 3px var(--color-yellow);
   }
 
-  /* Gelb-Akzentkarte hinter dem Bild (entgegengesetzt gekippt → Tiefe). */
-  .football__media::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: var(--radius-md);
-    background-color: var(--color-yellow);
-    transform: rotate(3deg);
+  .football__item:nth-child(odd) :global(img) {
+    transform: rotate(-1.5deg);
   }
 
-  .football__placeholder span {
-    font-size: var(--fs-100);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 60%, transparent);
-  }
-
-  /* Mobil: Bild über den Text holen. */
-  @media (max-width: 47.999rem) {
-    .football__media {
-      order: -1;
-      margin-bottom: var(--space-md);
-    }
+  .football__item:nth-child(even) :global(img) {
+    transform: rotate(1.5deg);
   }
 </style>
