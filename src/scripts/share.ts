@@ -11,8 +11,14 @@
  *   window.location.origin und öffnen sie via window.open(…, 'noopener,noreferrer').
  *   KEINE Third-Party-Scripts/SDKs.
  * - „Text kopieren": navigator.clipboard mit try/catch-Fallback (Text markieren).
- * - Nativer Teilen-Button: nur wenn navigator.share existiert; schickt wenn möglich das
- *   Daumen-hoch-Bild als Datei mit (Web Share Level 2).
+ * - Nativer Teilen-Button: nur wenn navigator.share existiert. Wichtig für die User-Geste:
+ *   das Share-Bild wird BEIM ÖFFNEN vorab geladen (fetch → Blob → File, gecacht), damit der
+ *   Klick-Handler navigator.share() OHNE vorheriges await aufruft (sonst frisst das fetch die
+ *   transiente Aktivierung → Desktop-Browser werfen NotAllowedError). Gestufte Daten: Basis
+ *   { text, url }; die Datei kommt NUR dazu, wenn navigator.canShare(...) sie akzeptiert
+ *   (i. d. R. nur mobil). Fehler-Strategie: AbortError (Nutzer bricht ab) → still; sonst
+ *   einmal ohne Datei erneut versuchen, dann lautlos auf „Text kopieren" zurückfallen — KEINE
+ *   rote „Teilen nicht möglich"-Meldung für ein Bonus-Feature.
  */
 import confetti from "canvas-confetti";
 
@@ -31,8 +37,14 @@ if (dialog) {
   const copyBtn = dialog.querySelector<HTMLButtonElement>("[data-share-copy]");
   const imgPath = dialog.dataset.shareImg ?? "";
 
+  const nativeSupported = typeof navigator.share === "function";
+
   let lastTrigger: HTMLElement | null = null;
   let burst: ReturnType<typeof confetti.create> | null = null;
+  // Vorab geladenes Share-Bild (für Web Share). Wird beim Öffnen gefüllt, damit der
+  // Klick-Handler synchron darauf zugreift (User-Geste bleibt erhalten).
+  let shareFile: File | null = null;
+  let shareImagePromise: Promise<File | null> | null = null;
 
   /** Marken-Konfettifarben aus den CSS-Tokens (Quelle der Wahrheit). */
   function brandColors(): string[] {
@@ -59,6 +71,28 @@ if (dialog) {
       origin: { y: 0.7 },
       colors: brandColors(),
     });
+  }
+
+  /** Share-Bild EINMAL laden und cachen (fetch → Blob → File). Fehlschlag ist ok:
+   *  dann wird ohne Datei geteilt. Same-origin (public/) → kein externer Request. */
+  function loadShareImage(): Promise<File | null> {
+    if (!shareImagePromise) {
+      shareImagePromise = (async () => {
+        if (!imgPath) return null;
+        try {
+          const res = await fetch(imgPath);
+          const blob = await res.blob();
+          shareFile = new File([blob], "dank-dennis.jpg", {
+            type: blob.type || "image/jpeg",
+          });
+          return shareFile;
+        } catch {
+          shareFile = null;
+          return null;
+        }
+      })();
+    }
+    return shareImagePromise;
   }
 
   function currentText(): string {
@@ -98,6 +132,9 @@ if (dialog) {
     setFeedback("");
     dialog?.showModal();
     celebrate();
+    // Share-Bild vorab laden, damit es beim Klick auf „Mehr…" schon bereit ist
+    // (nur sinnvoll, wenn Web Share überhaupt verfügbar ist).
+    if (nativeSupported) void loadShareImage();
   }
 
   // --- Trigger: Dialog öffnen + Konfetti ---
@@ -133,8 +170,8 @@ if (dialog) {
     });
   }
 
-  // --- Text kopieren (mit Fallback) ---
-  copyBtn?.addEventListener("click", async () => {
+  // --- Text kopieren (mit Fallback) — auch der letzte Ausweg fürs native Teilen ---
+  async function copyToClipboard(): Promise<void> {
     const payload = `${currentText()} ${shareUrl()}`;
     try {
       await navigator.clipboard.writeText(payload);
@@ -147,37 +184,44 @@ if (dialog) {
       }
       setFeedback("Text markiert – mit Strg/Cmd + C kopieren.");
     }
-  });
+  }
+
+  const isAbort = (error: unknown): boolean =>
+    error instanceof DOMException && error.name === "AbortError";
+
+  copyBtn?.addEventListener("click", () => void copyToClipboard());
 
   // --- Nativer Teilen-Button: nur einblenden, wenn Web Share verfügbar ist ---
-  if (nativeBtn && typeof navigator.share === "function") {
+  if (nativeBtn && nativeSupported) {
     nativeBtn.hidden = false;
     nativeBtn.addEventListener("click", async () => {
-      const text = currentText();
-      const url = shareUrl();
+      const base: ShareData = { text: currentText(), url: shareUrl() };
+
+      // Gestufte Daten: Datei NUR mitschicken, wenn sie schon geladen ist UND
+      // canShare(...inkl. Datei) sie akzeptiert (i. d. R. nur mobil). KEIN await vor
+      // share() → die User-Geste bleibt erhalten.
+      const withFile: ShareData =
+        shareFile &&
+        typeof navigator.canShare === "function" &&
+        navigator.canShare({ ...base, files: [shareFile] })
+          ? { ...base, files: [shareFile] }
+          : base;
+
       try {
-        // Wenn möglich, das Daumen-hoch-Bild als Datei mitschicken (Web Share Level 2).
-        if (imgPath && typeof navigator.canShare === "function") {
+        await navigator.share(withFile);
+      } catch (error) {
+        if (isAbort(error)) return; // Nutzer hat abgebrochen → still.
+        // Graceful Fallback: war eine Datei dabei, einmal ohne Datei erneut versuchen …
+        if (withFile.files?.length) {
           try {
-            const res = await fetch(imgPath);
-            const blob = await res.blob();
-            const file = new File([blob], "dank-dennis.jpg", {
-              type: blob.type || "image/jpeg",
-            });
-            if (navigator.canShare({ files: [file] })) {
-              await navigator.share({ text, url, files: [file] });
-              return;
-            }
-          } catch {
-            // Bild-Anhang fehlgeschlagen → unten ohne Datei teilen.
+            await navigator.share(base);
+            return;
+          } catch (retryError) {
+            if (isAbort(retryError)) return;
           }
         }
-        await navigator.share({ text, url });
-      } catch (error) {
-        // Abbruch durch den Nutzer ist kein Fehler.
-        if (error instanceof DOMException && error.name === "AbortError")
-          return;
-        setFeedback("Teilen nicht möglich.");
+        // … scheitert auch das, lautlos auf „Text kopieren" zurückfallen.
+        await copyToClipboard();
       }
     });
   }

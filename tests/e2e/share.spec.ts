@@ -29,6 +29,45 @@ async function stubWindowOpen(page: import("@playwright/test").Page) {
   });
 }
 
+/**
+ * Stubt navigator.share + navigator.canShare VOR dem Laden (damit share.ts den nativen
+ * Button bindet). Aufgezeichnete Aufrufe liegen in window.__share.calls.
+ * - canShareFiles: ob canShare(...mit files) true liefert (mobil ≈ true, Desktop ≈ false).
+ * - shareResult: "resolve" (Erfolg) | "abort" (Nutzer bricht ab) | "reject" (anderer Fehler).
+ */
+async function stubWebShare(
+  page: import("@playwright/test").Page,
+  opts: { canShareFiles: boolean; shareResult: "resolve" | "abort" | "reject" },
+) {
+  await page.addInitScript((o) => {
+    const w = window as unknown as {
+      __share: {
+        calls: Array<{ text?: string; url?: string; files: string[] }>;
+      };
+    };
+    w.__share = { calls: [] };
+    Object.defineProperty(navigator, "share", {
+      configurable: true,
+      value: async (data: ShareData) => {
+        w.__share.calls.push({
+          text: data?.text,
+          url: data?.url,
+          files: (data?.files ?? []).map((f) => f.name),
+        });
+        if (o.shareResult === "abort")
+          throw new DOMException("Abgebrochen", "AbortError");
+        if (o.shareResult === "reject")
+          throw new DOMException("Nicht erlaubt", "NotAllowedError");
+      },
+    });
+    Object.defineProperty(navigator, "canShare", {
+      configurable: true,
+      value: (data: ShareData) =>
+        data?.files?.length ? o.canShareFiles : true,
+    });
+  }, opts);
+}
+
 async function openDialog(page: import("@playwright/test").Page) {
   await page.getByRole("button", { name: "Dank Dennis!" }).click();
   await expect(page.locator("#share-dialog")).toHaveAttribute("open", "");
@@ -144,6 +183,83 @@ test("nativer Teilen-Button ist ohne navigator.share ausgeblendet", async ({
   } else {
     await expect(nativeBtn).toBeHidden();
   }
+});
+
+function shareCalls(page: import("@playwright/test").Page) {
+  return page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          __share: {
+            calls: Array<{ text?: string; url?: string; files: string[] }>;
+          };
+        }
+      ).__share.calls,
+  );
+}
+
+test("Web Share Desktop (canShare ohne files): teilt Text + URL, keine Fehlermeldung", async ({
+  page,
+}) => {
+  await stubWebShare(page, { canShareFiles: false, shareResult: "resolve" });
+  await page.goto("/");
+  await openDialog(page);
+  await expect(page.locator("[data-share-native]")).toBeVisible();
+
+  await page.locator("[data-share-native]").click();
+  const calls = await shareCalls(page);
+  expect(calls).toHaveLength(1);
+  expect(calls[0].files).toEqual([]); // Bild fällt auf Desktop weg
+  expect(calls[0].text).toBe(PRESET);
+  expect(calls[0].url).toBe(ORIGIN);
+  await expect(page.locator("[data-share-feedback]")).toHaveText("");
+});
+
+test("Web Share Mobil (canShare mit files): Bild wird als Datei mitgeschickt", async ({
+  page,
+}) => {
+  await stubWebShare(page, { canShareFiles: true, shareResult: "resolve" });
+  await page.goto("/");
+  // Auf das Vorab-Laden des Share-Bilds warten, damit die Datei bereitsteht.
+  await Promise.all([
+    page.waitForResponse((r) => r.url().includes("/share/dank-dennis.jpg")),
+    openDialog(page),
+  ]);
+  await page.waitForTimeout(150);
+
+  await page.locator("[data-share-native]").click();
+  const calls = await shareCalls(page);
+  expect(calls).toHaveLength(1);
+  expect(calls[0].files).toEqual(["dank-dennis.jpg"]);
+});
+
+test("Web Share AbortError (Nutzer bricht ab): keine Meldung", async ({
+  page,
+}) => {
+  await stubWebShare(page, { canShareFiles: true, shareResult: "abort" });
+  await page.goto("/");
+  await openDialog(page);
+  await page.locator("[data-share-native]").click();
+  await page.waitForTimeout(200);
+  await expect(page.locator("[data-share-feedback]")).toHaveText("");
+});
+
+test("Web Share scheitert (kein Abort): lautloser Fallback auf Kopieren, kein 'Teilen nicht möglich'", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"], {
+    origin: ORIGIN,
+  });
+  await stubWebShare(page, { canShareFiles: false, shareResult: "reject" });
+  await page.goto("/");
+  await openDialog(page);
+
+  await page.locator("[data-share-native]").click();
+  await expect(page.locator("[data-share-feedback]")).toContainText("Kopiert");
+  await expect(page.locator("[data-share-feedback]")).not.toContainText(
+    "Teilen nicht möglich",
+  );
 });
 
 test("Esc, Backdrop-Klick und ✕ schließen den Dialog (Fokus zurück auf CTA)", async ({
