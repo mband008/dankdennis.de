@@ -110,6 +110,22 @@ Status-Legende: ✅ erledigt · 🔜 als Nächstes · ⬜ offen
   Label, Icon-aria-labels); `share.spec.ts` + alle bestehenden Specs grün; keine
   Konsolen-Fehler; vor dem Klick keine externen Requests.
 
+- **M15 — Rechtsseiten (Impressum & Datenschutz)** ✅ _(→ M12)_
+  Zwei eigenständige Seiten `/impressum` + `/datenschutz`, gerendert aus den
+  `.md`-Quelltexten (`src/pages/*.md`) über ein neues `Legal.astro` (wrappt `Base`).
+  Seitenspezifischer `<title>`, `meta robots noindex, follow`, „← Zur Startseite"-Link,
+  ruhige `.prose`-Typografie (Tokens: Bricolage/Inter, ~70ch). Der Footer lebt jetzt
+  global im `Base`-Layout → Rechts-Links auf JEDER Seite; das Konfetti-Egg ist auf den
+  Rechtsseiten (kein Hero → kein Handler) abgeschaltet. Datenschutz-Entwurf finalisiert
+  (Banner raus, Aufsichtsbehörde + Stand eingesetzt).
+  **SAFETY-GUARD:** Test stellt sicher, dass die gerenderte `/datenschutz` keine Entwurfs-/
+  Platzhalter-Marker enthält („Entwurf — bitte", „[Datum", „[Anschrift") — keine unfertige
+  Rechtsseite kann live gehen.
+  **DoD:** beide Seiten rendern (h1 = Impressum / Datenschutzerklärung), Kern-Inhalte
+  vorhanden; Footer-Links überall + von Startseite erreichbar; Zurück-Link funktioniert;
+  `legal.spec.ts` + alle bestehenden Specs grün; keine Konsolen-Fehler; null externe
+  Requests.
+
 ---
 
 _Hinweis:_ M4–M8 hängen nur an M1 und sind grundsätzlich parallelisierbar; wir gehen sie
