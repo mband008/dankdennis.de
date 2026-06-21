@@ -1,14 +1,109 @@
 ---
 /**
  * About.astro — Sektion 2 „Über (Wer ist Dennis)".
- * M1: leeres Grundgerüst. Split mit Porträt + 2 Absätze folgen in M4.
- * Tonzone: warm/holzig (hell).
+ * M4: Split-Layout (Platzhalter-Porträt links, Text rechts; mobil Bild oben). Heading
+ * „Hi, ich bin Dennis." + 2 Absätze. Text aus docs/dankdennis_bauplan.md §2.
+ * Tonzone: warm/holzig (hell). Der Bild-links/Text-rechts-Aufbau spiegelt bewusst den
+ * Hero (Bild rechts) für etwas Layout-Rhythmus.
+ *
+ * Das Bild ist eine CSS-Platzhalter-Box (foto2 = lachendes Werkstatt-Porträt, Hochformat):
+ * echte Fotos werden gebündelt in M10 über astro:assets eingebaut (Skill add-photo).
+ * Im DOM steht der Text zuerst (Lesereihenfolge/A11y); auf Mobil holt CSS das Bild nach oben.
  */
 ---
 
-<section id="ueber" class="section tone-warm">
-  <div class="container">
-    <h2>Hi, ich bin Dennis.</h2>
-    <p class="placeholder-note">Über — Inhalt folgt (M4)</p>
+<section id="ueber" class="section tone-warm about">
+  <div class="container about__grid">
+    <div class="about__text">
+      <h2>Hi, ich bin Dennis.</h2>
+      <p>
+        Gelernter Tischler, im Hauptberuf Teil eines Schreiner-Teams im Ladenbau
+        – wir bauen die Einrichtungen, die du später in Geschäften
+        wiederfindest. Ich mag den Moment, in dem aus Holz und einer Idee etwas
+        Echtes wird, das hält.
+      </p>
+      <p>
+        Der Name dieser Seite? Ein alter Insider: Immer wenn irgendwo ein
+        Problem gelöst war, hieß es „Dank Dennis". Irgendwann lag die Domain
+        dazu auf dem Tisch – jetzt steht eben was drauf.
+      </p>
+    </div>
+
+    <figure class="about__media" aria-hidden="true">
+      <div class="about__placeholder">
+        <span>Foto 2 — Porträt</span>
+      </div>
+    </figure>
   </div>
 </section>
+
+<style>
+  .about__grid {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+
+  /* Bild steht in DOM nach dem Text, soll aber immer zuerst erscheinen:
+     mobil oben, auf Desktop in der linken Spalte. */
+  .about__media {
+    order: -1;
+    margin: 0;
+  }
+
+  /* Desktop: zwei Spalten, Bild links / Text rechts (spiegelt den Hero). */
+  @media (min-width: 48rem) {
+    .about__grid {
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: var(--space-2xl);
+    }
+  }
+
+  .about__text p + p {
+    margin-top: var(--space-md);
+  }
+
+  .about__text p {
+    font-size: var(--fs-300);
+  }
+
+  .about__text h2 {
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Platzhalter-Porträt — Hochformat-Box, holziger Look. Ersetzt durch foto2 in M10. */
+  .about__placeholder {
+    aspect-ratio: 3 / 4;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    background:
+      repeating-linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--bg-dark) 10%, transparent) 0,
+        color-mix(in srgb, var(--bg-dark) 10%, transparent) 2px,
+        transparent 2px,
+        transparent 14px
+      ),
+      color-mix(in srgb, var(--bg-dark) 6%, var(--bg));
+    border: 2px dashed color-mix(in srgb, var(--bg-dark) 25%, transparent);
+  }
+
+  .about__placeholder span {
+    font-size: var(--fs-100);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 55%, transparent);
+  }
+
+  /* Mobil: Bild über den Text holen. */
+  @media (max-width: 47.999rem) {
+    .about__media {
+      order: -1;
+    }
+
+    .about__placeholder {
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>
