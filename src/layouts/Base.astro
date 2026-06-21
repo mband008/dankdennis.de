@@ -33,14 +33,25 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Platzhalter-Favicon (Marken-SVG). Vollständiges Favicon/OG-Image folgt in M11. -->
+    <!-- Scroll-Reveal-Gate (M11): aktiviert den versteckten Startzustand NUR, wenn JS läuft
+         UND IntersectionObserver verfügbar ist (Feature-Detection). Inline im <head> →
+         synchron vor dem ersten Paint → kein FOUC. Ohne JS / ohne Observer wird die Klasse
+         nie gesetzt → Inhalt bleibt sofort vollständig sichtbar (Progressive Enhancement).
+         Die Bewegung selbst gated zusätzlich prefers-reduced-motion in global.css. -->
+    <script is:inline>
+      if ("IntersectionObserver" in window) {
+        document.documentElement.classList.add("js-reveal");
+      }
+    </script>
+
+    <!-- Platzhalter-Favicon (Marken-SVG). Vollständiges Favicon/OG-Image folgt in M12. -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <!-- Open Graph (OG-Image folgt in M11/Polish) -->
+    <!-- Open Graph (OG-Image folgt in M12/Polish) -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -52,5 +63,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <slot />
+
+    <script>
+      // Scroll-Reveal-Mechanismus (M11): IntersectionObserver setzt einmalig .is-visible auf
+      // [data-reveal]-Elemente. Astro bündelt das Modul client-seitig. Reagiert auf
+      // prefers-reduced-motion und hat einen reveal-all-Fallback (Inhalt nie dauerhaft versteckt).
+      import "../scripts/reveal.ts";
+    </script>
   </body>
 </html>
