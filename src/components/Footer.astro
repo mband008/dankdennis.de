@@ -5,23 +5,40 @@
  * M9: kleine Konfetti-Reprise als Easter-Egg — der Button trägt data-confetti und wird
  * vom globalen Handler (src/scripts/confetti.ts, via Hero eingebunden) automatisch
  * gebunden. prefers-reduced-motion: reduce → kein Konfetti (in confetti.ts geregelt).
+ * M15: lebt jetzt global im Base-Layout → Rechts-Links (Impressum/Datenschutz) auf JEDER
+ * Seite. Das Egg ist via `egg`-Prop abschaltbar (auf Rechtsseiten aus, weil dort der
+ * Konfetti-Handler fehlt → toter Button vermieden).
  * Tonzone: warm/holzig (dunkel) — ruhiger Abschluss.
  */
+interface Props {
+  /** Konfetti-Egg zeigen? Aus, wo der Konfetti-Handler (via Hero) nicht geladen wird. */
+  egg?: boolean;
+}
+
+const { egg = true } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
 <footer id="footer" class="section tone-wood footer">
   <div class="container footer__inner">
     <p class="footer__line" data-reveal>Dank Dennis · {year}</p>
-    <button
-      type="button"
-      class="footer__egg"
-      data-confetti
-      data-reveal
-      style="--reveal-delay: var(--reveal-stage)"
-    >
-      Noch ein Dank? 🎉
-    </button>
+    <nav class="footer__legal" aria-label="Rechtliches">
+      <a href="/impressum">Impressum</a>
+      <a href="/datenschutz">Datenschutz</a>
+    </nav>
+    {
+      egg && (
+        <button
+          type="button"
+          class="footer__egg"
+          data-confetti
+          data-reveal
+          style="--reveal-delay: var(--reveal-stage)"
+        >
+          Noch ein Dank? 🎉
+        </button>
+      )
+    }
   </div>
 </footer>
 
@@ -37,6 +54,27 @@ const year = new Date().getFullYear();
   .footer__line {
     font-family: var(--font-display);
     font-weight: var(--fw-bold);
+  }
+
+  /* Rechts-Links (M15): dezent, aber klar klickbar auf dunklem Grund. */
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    font-size: var(--fs-100);
+  }
+
+  .footer__legal a {
+    text-decoration: none;
+    color: inherit;
+    text-underline-offset: 0.2em;
+    transition: color var(--motion-fast) var(--ease-standard);
+  }
+
+  .footer__legal a:hover,
+  .footer__legal a:focus-visible {
+    color: var(--color-accent); /* Gelb auf dunklem Grund (tone-wood) */
+    text-decoration: underline;
   }
 
   /* Kleiner Ghost-Button (Reprise des Hero-CTA), dezent auf dunklem Grund. */
