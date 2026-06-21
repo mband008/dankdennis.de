@@ -9,7 +9,8 @@ import { test, expect } from "@playwright/test";
  *  5. Komponiertes OG-Bild (public/og.png) ist im Build erreichbar (1200×630-Asset).
  */
 
-const SITE = "https://dankdennis.de";
+// Deploy-/Canonical-URL — muss mit `site` in astro.config.mjs übereinstimmen.
+const SITE = "https://dankdennis.sontypiminternet.de";
 
 async function contentOf(
   page: import("@playwright/test").Page,
