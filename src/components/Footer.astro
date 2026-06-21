@@ -8,6 +8,8 @@
  * M15: lebt jetzt global im Base-Layout → Rechts-Links (Impressum/Datenschutz) auf JEDER
  * Seite. Das Egg ist via `egg`-Prop abschaltbar (auf Rechtsseiten aus, weil dort der
  * Konfetti-Handler fehlt → toter Button vermieden).
+ * M16: dezente Credit-Zeile darunter — „Made with ❤️ von Michael Banditt für seinen
+ * geliebten Bruder." (Link auf michaelbanditt.de, neuer Tab, noopener).
  * Tonzone: warm/holzig (dunkel) — ruhiger Abschluss.
  */
 interface Props {
@@ -20,25 +22,37 @@ const year = new Date().getFullYear();
 ---
 
 <footer id="footer" class="section tone-wood footer">
-  <div class="container footer__inner">
-    <p class="footer__line" data-reveal>Dank Dennis · {year}</p>
-    <nav class="footer__legal" aria-label="Rechtliches">
-      <a href="/impressum">Impressum</a>
-      <a href="/datenschutz">Datenschutz</a>
-    </nav>
-    {
-      egg && (
-        <button
-          type="button"
-          class="footer__egg"
-          data-confetti
-          data-reveal
-          style="--reveal-delay: var(--reveal-stage)"
-        >
-          Noch ein Dank? 🎉
-        </button>
-      )
-    }
+  <div class="container">
+    <div class="footer__inner">
+      <p class="footer__line" data-reveal>Dank Dennis · {year}</p>
+      <nav class="footer__legal" aria-label="Rechtliches">
+        <a href="/impressum">Impressum</a>
+        <a href="/datenschutz">Datenschutz</a>
+      </nav>
+      {
+        egg && (
+          <button
+            type="button"
+            class="footer__egg"
+            data-confetti
+            data-reveal
+            style="--reveal-delay: var(--reveal-stage)"
+          >
+            Noch ein Dank? 🎉
+          </button>
+        )
+      }
+    </div>
+    <p class="footer__credit" data-reveal>
+      Made with <span class="footer__heart" role="img" aria-label="Liebe"
+        >❤️</span
+      >
+      von <a
+        href="https://michaelbanditt.de"
+        target="_blank"
+        rel="noopener noreferrer">Michael Banditt</a
+      > für seinen geliebten Bruder.
+    </p>
   </div>
 </footer>
 
@@ -75,6 +89,30 @@ const year = new Date().getFullYear();
   .footer__legal a:focus-visible {
     color: var(--color-accent); /* Gelb auf dunklem Grund (tone-wood) */
     text-decoration: underline;
+  }
+
+  /* Credit-Zeile (M16): leise unter dem Footer-Row, ruhiger Abschluss. */
+  .footer__credit {
+    margin-top: var(--space-lg);
+    font-size: var(--fs-100);
+    color: color-mix(in srgb, currentColor 70%, transparent);
+  }
+
+  .footer__heart {
+    /* Emoji nicht ausgrauen — Farbe bleibt voll, Text drumherum ist gedimmt. */
+    color: initial;
+  }
+
+  .footer__credit a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    transition: color var(--motion-fast) var(--ease-standard);
+  }
+
+  .footer__credit a:hover,
+  .footer__credit a:focus-visible {
+    color: var(--color-accent); /* Gelb auf dunklem Grund (tone-wood) */
   }
 
   /* Kleiner Ghost-Button (Reprise des Hero-CTA), dezent auf dunklem Grund. */
