@@ -1,14 +1,48 @@
 ---
 /**
  * Counter.astro — Sektion 5 „Probleme gelöst dank Dennis".
- * M1: leeres Grundgerüst. Große Scoreboard-Zahl + Count-Up (IntersectionObserver)
- * folgen in M7. Tonzone: dunkles Scoreboard (warm/holzig dunkel, Gelb-Akzent).
+ * M7: Scoreboard-Optik mit großer Spaßzahl (1.337, rein dekorativ). Die Zahl zählt beim
+ * Reinscrollen von 0 hoch (src/scripts/counter.ts, IntersectionObserver). Untertext aus
+ * docs/dankdennis_bauplan.md §5. prefers-reduced-motion: reduce → sofort Endwert.
+ * Tonzone: dunkles Scoreboard (tone-wood: Espresso-Grund, Gelb-Akzent).
  */
 ---
 
-<section id="counter" class="section tone-wood">
-  <div class="container">
+<section id="counter" class="section tone-wood counter">
+  <div class="container counter__inner">
     <h2>Probleme gelöst dank Dennis</h2>
-    <p class="placeholder-note">Counter — Inhalt folgt (M7)</p>
+    <p class="counter__number" data-counter data-counter-target="1337">1.337</p>
+    <p class="counter__sub">…und es werden täglich mehr.</p>
   </div>
 </section>
+
+<style>
+  .counter__inner {
+    text-align: center;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-md);
+  }
+
+  .counter__number {
+    font-family: var(--font-display);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-tight);
+    color: var(--color-accent); /* Gelb auf dunklem Grund (tone-wood) */
+    font-size: clamp(4rem, 2rem + 12vw, 9rem);
+    font-variant-numeric: tabular-nums; /* keine Breiten-Sprünge beim Hochzählen */
+    letter-spacing: 0.02em;
+    max-width: none;
+  }
+
+  .counter__sub {
+    font-size: var(--fs-300);
+    color: color-mix(in srgb, currentColor 80%, transparent);
+  }
+</style>
+
+<script>
+  // Count-Up-Logik (M7): bündelt den IntersectionObserver-Zähler. Astro bündelt das Modul
+  // client-seitig. Reagiert auf prefers-reduced-motion (sofort Endwert, kein Hochzählen).
+  import "../scripts/counter.ts";
+</script>
