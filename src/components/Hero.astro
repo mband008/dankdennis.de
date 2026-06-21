@@ -3,8 +3,12 @@
  * Hero.astro — Sektion 1 (Above the fold).
  * M2: Split-Layout (Text links, Bild rechts; mobil Bild oben). Headline, Untertitel,
  * Button „Dank Dennis!".
- * M3: Der Button (data-confetti) löst per src/scripts/confetti.ts Konfetti aus; Hinweis
- * „(probier's aus)". prefers-reduced-motion: reduce → kein Konfetti.
+ * M3: Der Button löste per Konfetti aus; Hinweis „(probier's aus)".
+ *      prefers-reduced-motion: reduce → kein Konfetti.
+ * M14: Der CTA ist jetzt der Trigger des Teilen-Dialogs (data-share, aria-haspopup/
+ *      -controls). Klick öffnet das <dialog> UND feuert den Konfetti-Burst (in
+ *      src/scripts/share.ts, Top-Layer über dem Modal). Der confetti.ts-Import unten
+ *      bleibt — er bindet weiterhin die Footer-Reprise (data-confetti).
  * M10: echtes Foto (open_hand) via astro:assets (<Picture>, AVIF/WebP + srcset).
  *      Above the fold → eager geladen. Foto-Zuordnung: docs/ (Foto-Plan M10).
  * Trägt die einzige <h1> der Seite. Inhalte aus docs/dankdennis_bauplan.md §1.
@@ -24,7 +28,13 @@ import heroImg from "../assets/images/Dennis_neutral_open_hand.png";
         Tischler aus Überzeugung, Fußballer aus Leidenschaft – und der Typ, der
         einfach anpackt.
       </p>
-      <button type="button" class="btn hero__cta" data-confetti>
+      <button
+        type="button"
+        class="btn hero__cta"
+        data-share
+        aria-haspopup="dialog"
+        aria-controls="share-dialog"
+      >
         Dank Dennis!
       </button>
       <p class="hero__hint">(probier's aus)</p>

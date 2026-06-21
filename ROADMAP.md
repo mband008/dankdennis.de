@@ -95,6 +95,21 @@ Status-Legende: ✅ erledigt · 🔜 als Nächstes · ⬜ offen
   **DoD:** Manueller Push auf `main` deployt automatisch; Seite unter dankdennis.de mit SSL
   erreichbar; `pre-push`-Gate nachweislich aktiv (roter Push wird verhindert).
 
+- **M14 — Teilen-Dialog (Share)** ✅ _(→ M3/M12)_
+  Der Hero-CTA „Dank Dennis!" öffnet ein natives `<dialog>` (showModal) MIT Konfetti-Burst
+  (Top-Layer, über dem Modal; `prefers-reduced-motion: reduce` → kein Konfetti, keine
+  Bewegung). Editierbares Textfeld (Preset „Wieder ein Problem gelöst. Dank Dennis!
+  #dankdennis") speist alle textfähigen Kanäle. Feste Outbound-Buttons (E-Mail/WhatsApp/
+  X/Telegram/Facebook) öffnen in neuem Tab via `window.open(…, 'noopener,noreferrer')`;
+  „Text kopieren" (Clipboard + Fallback) und nativer Teilen-Button (Web Share API, nur wenn
+  `navigator.share` existiert, schickt das Daumen-hoch-Bild als Datei mit). Eigenes
+  web-optimiertes Share-Bild (`public/share/dank-dennis.jpg`) für Web-Share + Download.
+  **CONSTRAINT:** keine Third-Party-Scripts/SDKs, „null externe Requests" bis zum Klick.
+  **DoD:** Dialog öffnet + Konfetti; Buttons bauen korrekte URLs (auch nach Editieren);
+  Copy-Feedback; Esc/Backdrop/✕ schließen (Fokus zurück auf CTA); A11y (aria-labelledby,
+  Label, Icon-aria-labels); `share.spec.ts` + alle bestehenden Specs grün; keine
+  Konsolen-Fehler; vor dem Klick keine externen Requests.
+
 ---
 
 _Hinweis:_ M4–M8 hängen nur an M1 und sind grundsätzlich parallelisierbar; wir gehen sie
