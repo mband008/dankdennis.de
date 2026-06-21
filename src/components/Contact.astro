@@ -174,10 +174,11 @@ const isExternal = (href: string) => href.startsWith("http");
     --brand: var(--brand-whatsapp);
   }
 
-  /* Instagram füllt sich beim Hover mit dem Marken-Verlauf statt einer Vollfarbe. */
+  /* Instagram füllt sich beim Hover mit dem Marken-Verlauf statt einer Vollfarbe.
+     Der Rand bleibt (über --brand) Instagram-Pink — kein transparenter Rand, der
+     sonst als heller Ring um die Pille aufblitzt. */
   .contact__btn--instagram:hover,
   .contact__btn--instagram:focus-visible {
     background: var(--brand-instagram-gradient);
-    border-color: transparent;
   }
 </style>
