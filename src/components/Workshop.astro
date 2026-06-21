@@ -1,14 +1,85 @@
 ---
 /**
  * Workshop.astro — Sektion 3 „In der Werkstatt".
- * M1: leeres Grundgerüst. Großes Bild + kurzer Text (galerie-fähig) folgen in M5.
- * Tonzone: warm/holzig (dunkel/atmosphärisch — Holz, Werkstattlicht).
+ * M5: Intro (Heading + kurzer Text) über einer galerie-fähigen Bild-Struktur. Aktuell
+ * EIN großes Platzhalterbild (foto1 = Werkstatt-Action, Querformat); später reichen
+ * weitere <figure>-Items in .workshop__gallery für 2–3 Shots — keine Layout-Änderung nötig
+ * (auto-fit-Grid). Text aus docs/dankdennis_bauplan.md §3.
+ * Tonzone: warm/holzig (dunkel/atmosphärisch — Holz, Werkstattlicht), Gelb-Akzent.
+ *
+ * Bilder sind CSS-Platzhalter-Boxen; echte Fotos folgen gebündelt in M10 (Skill add-photo).
  */
 ---
 
-<section id="werkstatt" class="section tone-wood">
+<section id="werkstatt" class="section tone-wood workshop">
   <div class="container">
-    <h2>In der Werkstatt</h2>
-    <p class="placeholder-note">Werkstatt — Inhalt folgt (M5)</p>
+    <div class="workshop__intro">
+      <h2>In der Werkstatt</h2>
+      <p>
+        Vom groben Zuschnitt bis zur sauberen Verbindung: Präzision ist für mich
+        kein Extra, sondern der Standard. Was ich anpacke, soll funktionieren –
+        und gut aussehen.
+      </p>
+    </div>
+
+    <!-- Galerie-fähig: weitere <figure class="workshop__item"> ergänzen (M10). -->
+    <div class="workshop__gallery">
+      <figure class="workshop__item" aria-hidden="true">
+        <div class="workshop__placeholder">
+          <span>Foto 1 — Werkstatt-Action</span>
+        </div>
+      </figure>
+    </div>
   </div>
 </section>
+
+<style>
+  .workshop__intro {
+    margin-bottom: var(--space-xl);
+  }
+
+  .workshop__intro h2 {
+    margin-bottom: var(--space-md);
+  }
+
+  .workshop__intro p {
+    font-size: var(--fs-300);
+  }
+
+  /* Galerie: ein Bild füllt die Breite (groß); mehrere wandern in Spalten. */
+  .workshop__gallery {
+    display: grid;
+    gap: var(--space-lg);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  }
+
+  .workshop__item {
+    margin: 0;
+  }
+
+  /* Platzhalter — adaptiv über currentColor, funktioniert auf dunklem Grund.
+     Querformat (foto1 = Werkstatt-Action). Ersetzt durch echtes Bild in M10. */
+  .workshop__placeholder {
+    aspect-ratio: 3 / 2;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    background:
+      repeating-linear-gradient(
+        135deg,
+        color-mix(in srgb, currentColor 8%, transparent) 0,
+        color-mix(in srgb, currentColor 8%, transparent) 2px,
+        transparent 2px,
+        transparent 14px
+      ),
+      color-mix(in srgb, currentColor 4%, transparent);
+    border: 2px dashed color-mix(in srgb, currentColor 22%, transparent);
+  }
+
+  .workshop__placeholder span {
+    font-size: var(--fs-100);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 55%, transparent);
+  }
+</style>
