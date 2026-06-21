@@ -1,15 +1,137 @@
 ---
 /**
  * Contact.astro — Sektion 6 „Sag Hallo".
- * M1: leeres Grundgerüst. Text + Platzhalter-Buttons (E-Mail/Instagram/LinkedIn/
- * WhatsApp) folgen in M8 — Kontaktwege sind noch offen.
+ * M8: Text + Kontakt-Buttons. Die Kontaktwege sind noch OFFEN (siehe CLAUDE.md /
+ * docs/dankdennis_bauplan.md §6) → die Buttons sind Platzhalter.
  * Tonzone: warm/holzig (hell).
+ *
+ * AKTIVIEREN (später): im contacts-Array unten je Eintrag `href` setzen — fertig.
+ *   - E-Mail:    href: "mailto:dennis@dankdennis.de"
+ *   - Instagram: href: "https://instagram.com/<handle>"
+ *   - LinkedIn:  href: "https://www.linkedin.com/in/<handle>"
+ *   - WhatsApp:  href: "https://wa.me/<nummer>"
+ * Einträge mit href werden automatisch zu echten Links (target/rel für extern gesetzt),
+ * solange href null ist, bleibt es ein nicht-fokussierbarer Platzhalter (aria-disabled).
  */
+interface Contact {
+  label: string;
+  href: string | null;
+}
+
+const contacts: Contact[] = [
+  { label: "E-Mail", href: null },
+  { label: "Instagram", href: null },
+  { label: "LinkedIn", href: null },
+  { label: "WhatsApp", href: null },
+];
+
+const isExternal = (href: string) => href.startsWith("http");
 ---
 
-<section id="kontakt" class="section tone-warm">
-  <div class="container">
+<section id="kontakt" class="section tone-warm contact">
+  <div class="container contact__inner">
     <h2>Sag Hallo</h2>
-    <p class="placeholder-note">Kontakt — Inhalt folgt (M8)</p>
+    <p class="contact__lead">
+      Lust auf einen Plausch, eine Zusammenarbeit – oder willst du einfach mal
+      Danke sagen? Meld dich.
+    </p>
+
+    <ul class="contact__list" role="list">
+      {
+        contacts.map(({ label, href }) => (
+          <li>
+            {href ? (
+              <a
+                class="contact__btn"
+                href={href}
+                {...(isExternal(href)
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+              >
+                {label}
+              </a>
+            ) : (
+              <span
+                class="contact__btn contact__btn--placeholder"
+                data-placeholder
+                role="link"
+                aria-disabled="true"
+              >
+                {label}
+                <span class="contact__soon">bald</span>
+              </span>
+            )}
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
+
+<style>
+  .contact__inner {
+    text-align: center;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-md);
+  }
+
+  .contact__lead {
+    font-size: var(--fs-300);
+  }
+
+  .contact__list {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-md);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+
+  /* Gemeinsame Pill-Optik für echte Links und Platzhalter. */
+  .contact__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-display);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-200);
+    text-decoration: none;
+    border-radius: var(--radius-pill);
+    padding: var(--space-sm) var(--space-lg);
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    background-color: transparent;
+    transition:
+      background-color var(--motion-fast) var(--ease-standard),
+      color var(--motion-fast) var(--ease-standard),
+      transform var(--motion-fast) var(--ease-standard);
+  }
+
+  /* Hover/Fokus nur für echte Links (a). */
+  a.contact__btn:hover,
+  a.contact__btn:focus-visible {
+    background-color: var(--color-accent);
+    color: var(--text-on-dark);
+    transform: translateY(-2px);
+  }
+
+  /* Platzhalter: gedämpft, nicht interaktiv. */
+  .contact__btn--placeholder {
+    border-color: color-mix(in srgb, currentColor 25%, transparent);
+    color: color-mix(in srgb, currentColor 55%, transparent);
+    cursor: default;
+  }
+
+  .contact__soon {
+    font-size: var(--fs-100);
+    font-weight: var(--fw-regular);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0 var(--space-xs);
+    border-radius: var(--radius-sm);
+    background-color: color-mix(in srgb, currentColor 12%, transparent);
+  }
+</style>
