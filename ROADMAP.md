@@ -82,7 +82,7 @@ Status-Legende: ✅ erledigt · 🔜 als Nächstes · ⬜ offen
   mit `reduce` alles sofort sichtbar ohne Transform/Fade; No-JS-Gegenprobe sichtbar; bestehende
   Specs grün; keine Konsolen-Fehler.
 
-- **M12 — Polish & QA** ⬜ _(→ M2–M11)_
+- **M12 — Polish & QA** ✅ _(→ M2–M11)_
   A11y (Kontraste, Alt-Texte, Fokus), Meta/SEO/OpenGraph + OG-Image, Favicon, Lighthouse,
   Cross-Viewport-Durchlauf, vollständige Playwright-Suite.
   **DoD:** Lighthouse gut (Perf/A11y/SEO), volle Test-Suite grün, keine Konsolen-Fehler.
