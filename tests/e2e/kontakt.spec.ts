@@ -33,9 +33,10 @@ test("alle vier Kontakt-Buttons sind als Platzhalter vorhanden", async ({
   for (const label of LABELS) {
     const btn = page.locator("#kontakt .contact__btn", { hasText: label });
     await expect(btn).toBeVisible();
-    // Platzhalter: markiert und (noch) kein echter Link.
+    // Platzhalter-Markierung bleibt (noch kein echter Link) …
     await expect(btn).toHaveAttribute("data-placeholder", "");
-    await expect(btn).toHaveAttribute("aria-disabled", "true");
+    // … und jeder Button trägt sein Plattform-Icon (Inline-SVG).
+    await expect(btn.locator("svg")).toHaveCount(1);
   }
 
   // Solange Kontaktwege offen sind: keine echten Links (kein <a href>) in der Sektion.
