@@ -49,6 +49,24 @@ test("Split-Layout: mobil Bild oben, Desktop Bild rechts", async ({ page }) => {
   }
 });
 
+test("Hero-Foto ist optimiert eingebunden (AVIF/WebP, srcset, Alt)", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const media = page.locator("#hero .hero__media");
+  await expect(media.locator("picture source[type='image/avif']")).toHaveCount(
+    1,
+  );
+  const img = media.locator("img");
+  await expect(img).toBeVisible();
+  await expect
+    .poll(async () => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
+    .toBeGreaterThan(0);
+  await expect(img).toHaveAttribute("alt", /Dennis/);
+  expect(await img.getAttribute("srcset")).toBeTruthy();
+});
+
 test("keine Konsolen-Fehler in der Hero-Sektion", async ({ page }) => {
   const consoleErrors: string[] = [];
   page.on("console", (msg) => {

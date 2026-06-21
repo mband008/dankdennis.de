@@ -22,17 +22,31 @@ test("Heading und Text sind vorhanden", async ({ page }) => {
   await expect(workshop.locator(".placeholder-note")).toHaveCount(0);
 });
 
-test("galerie-fähige Bild-Struktur mit mindestens einem Item", async ({
-  page,
-}) => {
+test("Galerie zeigt vier optimierte Fotos mit Alt-Texten", async ({ page }) => {
   await page.goto("/");
 
   const gallery = page.locator("#werkstatt .workshop__gallery");
   await expect(gallery).toBeVisible();
 
   const items = gallery.locator(".workshop__item");
-  expect(await items.count()).toBeGreaterThanOrEqual(1);
-  await expect(items.first()).toBeVisible();
+  await expect(items).toHaveCount(4);
+
+  // Jedes Item: ein <picture> mit AVIF/WebP-Quellen und ein <img> mit Alt + srcset.
+  for (let i = 0; i < 4; i++) {
+    const item = items.nth(i);
+    await expect(item.locator("picture source[type='image/avif']")).toHaveCount(
+      1,
+    );
+    const img = item.locator("img");
+    await expect(img).toBeVisible();
+    // Tatsächlich geladen (kein 404): naturalWidth > 0 nach Reinscrollen.
+    await img.scrollIntoViewIfNeeded();
+    await expect
+      .poll(async () => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
+      .toBeGreaterThan(0);
+    expect((await img.getAttribute("alt"))?.length ?? 0).toBeGreaterThan(0);
+    expect(await img.getAttribute("srcset")).toBeTruthy();
+  }
 });
 
 test("keine Konsolen-Fehler in der Werkstatt-Sektion", async ({ page }) => {
