@@ -4,7 +4,8 @@
  * M4: Split-Layout (Porträt links, Text rechts; mobil Bild oben). Heading
  * „Hi, ich bin Dennis." + 2 Absätze. Text aus docs/dankdennis_bauplan.md §2.
  * M10: echtes Werkstatt-Porträt (Carp_neutral_cam) via astro:assets (<Picture>,
- *      AVIF/WebP + srcset, lazy). Foto-Zuordnung: docs/ (Foto-Plan M10).
+ *      AVIF/WebP + srcset). eager geladen (direkt unter dem Hero, das zweite Bild
+ *      der Seite) → kein Lazy-Pop-in oben. Foto-Zuordnung: docs/ (Foto-Plan M10).
  * Tonzone: warm/holzig (hell). Der Bild-links/Text-rechts-Aufbau spiegelt bewusst den
  * Hero (Bild rechts) für etwas Layout-Rhythmus.
  * Im DOM steht der Text zuerst (Lesereihenfolge/A11y); auf Mobil holt CSS das Bild nach oben.
@@ -37,7 +38,7 @@ import aboutImg from "../assets/images/Dennis_Carp_neutral_cam.png";
         alt="Dennis in seiner Werkstatt, mit Lederschürze, lächelt in die Kamera"
         widths={[400, 700, 1122]}
         sizes="(min-width: 48rem) 40vw, 100vw"
-        loading="lazy"
+        loading="eager"
       />
     </figure>
   </div>
