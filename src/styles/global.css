@@ -147,6 +147,28 @@ p {
   outline-offset: 2px;
 }
 
+/* Skip-Link (A11y, M12): außerhalb des Viewports geparkt, springt bei :focus sichtbar
+ * oben links ein. So überspringen Tastatur-/Screenreader-Nutzer direkt zum Hauptinhalt. */
+.skip-link {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  z-index: 100;
+  padding: var(--space-xs) var(--space-md);
+  background-color: var(--color-red);
+  color: var(--text-on-dark);
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transform: translateY(-150%);
+  transition: transform var(--motion-fast) var(--ease-standard);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 /* ---------- Scroll-Reveal (M11) ---------- *
  * Sanftes Einblenden beim Reinscrollen. Wiederverwendbarer Mechanismus: Elemente tragen
  * [data-reveal]; src/scripts/reveal.ts setzt per IntersectionObserver einmalig .is-visible.

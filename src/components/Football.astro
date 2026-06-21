@@ -77,7 +77,10 @@ const shots = [
     font-weight: var(--fw-bold);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-accent); /* Gelb auf rotem Grund (tone-sport) */
+    /* A11y (M12): Off-White statt Gelb auf rotem Grund. Gelb auf Rot ist als kleiner
+       Text zu kontrastarm (3.2:1 < AA 4.5). Off-White auf Rot = 5.2:1 ✓. Der Gelb-Akzent
+       der Sport-Zone bleibt über die Foto-Rahmen erhalten. */
+    color: var(--text-on-dark);
     font-size: var(--fs-100);
     margin-bottom: var(--space-xs);
   }
