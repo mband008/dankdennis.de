@@ -223,3 +223,77 @@ p {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Rechtsseiten / Prose (M15) ---------- *
+ * Schlichte, gut lesbare Fließtext-Typografie für Impressum/Datenschutz. Der Markdown-
+ * Inhalt landet via Legal.astro im <article class="prose"> — diese Regeln sind bewusst
+ * global (unscoped), weil gerendertes Markdown keine Astro-Scope-Attribute trägt.
+ * Tokens only: Bricolage (Display) für Überschriften, Inter (Body) für Text.
+ */
+.legal__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.legal__back {
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-100);
+  text-decoration: none;
+  color: var(--color-red);
+  text-underline-offset: 0.2em;
+}
+
+.legal__back:hover,
+.legal__back:focus-visible {
+  text-decoration: underline;
+}
+
+/* Angenehme Zeilenlänge; Abstände kommen aus den Spacing-Tokens. */
+.prose {
+  max-width: 70ch;
+}
+
+.prose > * + * {
+  margin-top: var(--space-md);
+}
+
+.prose h1 {
+  font-size: var(--fs-500);
+}
+
+.prose h2 {
+  font-size: var(--fs-400);
+  margin-top: var(--space-2xl);
+}
+
+.prose h3 {
+  font-size: var(--fs-300);
+  margin-top: var(--space-xl);
+}
+
+/* Erster Block direkt unter einer Überschrift rückt enger heran. */
+.prose h1 + *,
+.prose h2 + *,
+.prose h3 + * {
+  margin-top: var(--space-sm);
+}
+
+.prose a {
+  color: var(--color-red);
+  text-underline-offset: 0.15em;
+}
+
+.prose ul {
+  padding-left: var(--space-lg);
+}
+
+.prose li + li {
+  margin-top: var(--space-2xs);
+}
+
+.prose strong {
+  font-weight: var(--fw-bold);
+}
