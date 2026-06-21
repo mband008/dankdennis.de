@@ -68,12 +68,26 @@ Status-Legende: ✅ erledigt · 🔜 als Nächstes · ⬜ offen
   Alt-Texte, `loading="lazy"` für untere Bilder.
   **DoD:** Reale Bilder optimiert ausgeliefert (WebP/srcset), Layouts stimmen mobil+Desktop.
 
-- **M11 — Polish & QA** ⬜ _(→ M2–M10)_
+- **M11 — Scroll-Reveals (Motion)** ⬜ _(→ M4–M9; Galerien M5/M6)_
+  Inhalte unter dem Fold erscheinen beim Reinscrollen sanft (opacity + minimaler translateY,
+  gestaffelt Überschrift→Inhalt) für Über/Werkstatt/Fußball/Counter/Kontakt/Footer; Werkstatt-
+  und Fußball-Galerie staffeln ihre Fotos nacheinander. Hero bleibt unverändert (über dem Fold).
+  Mechanismus: IntersectionObserver setzt `is-visible` (einmalig), Animation rein in CSS über die
+  Motion-Tokens. Counter: nur Überschrift/Untertext revealen — die Zahl behält ihren Count-Up.
+  **Progressive Enhancement (nicht verhandelbar):** versteckter Startzustand NUR wenn JS läuft
+  (`html.js-reveal`, gesetzt per Feature-Detection) UND `prefers-reduced-motion: no-preference`;
+  ohne JS, bei `reduce` oder wenn das Reveal nicht durchläuft (try/catch reveal-all) ist alles
+  sofort vollständig sichtbar — kein Inhalt bleibt dauerhaft versteckt.
+  **DoD:** mit erlaubter Bewegung erscheinen Sektionen/Galerie-Fotos beim Scrollen (Stagger greift);
+  mit `reduce` alles sofort sichtbar ohne Transform/Fade; No-JS-Gegenprobe sichtbar; bestehende
+  Specs grün; keine Konsolen-Fehler.
+
+- **M12 — Polish & QA** ⬜ _(→ M2–M11)_
   A11y (Kontraste, Alt-Texte, Fokus), Meta/SEO/OpenGraph + OG-Image, Favicon, Lighthouse,
   Cross-Viewport-Durchlauf, vollständige Playwright-Suite.
   **DoD:** Lighthouse gut (Perf/A11y/SEO), volle Test-Suite grün, keine Konsolen-Fehler.
 
-- **M12 — Deploy (Coolify)** ⬜ _(→ M11)_
+- **M13 — Deploy (Coolify)** ⬜ _(→ M12)_
   Coolify-App: Static-Build `npm run build`, Publish-Dir `dist/`, Auto-Deploy-Webhook bei
   Push auf `main`, Domain `dankdennis.de` + SSL. **Merge nach `main` macht Claude lokal
   (`--no-ff`); den Push macht der Mensch.** Der `pre-push`-Hook ist das Test-Gate. Skill
