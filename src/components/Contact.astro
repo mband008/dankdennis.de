@@ -1,9 +1,8 @@
 ---
 /**
  * Contact.astro — Sektion 6 „Sag Hallo".
- * M8: Text + Kontakt-Buttons. Die Kontaktwege sind noch OFFEN (siehe CLAUDE.md /
- * docs/dankdennis_bauplan.md §6) → die Buttons sind Platzhalter (data-placeholder),
- * sehen aber bereits aktiv/gebrandet aus.
+ * M8: Text + Kontakt-Buttons. E-Mail, Instagram und WhatsApp sind echte Links;
+ * LinkedIn existiert (noch) nicht → ausgegrauter „bald"-Button statt Link.
  *
  * Optik (Brand-on-Hover): Outline-Pille mit Plattform-Icon in Markenfarbe; bei
  * Hover/Fokus füllt sich der Button in der jeweiligen Plattformfarbe (Instagram als
@@ -11,13 +10,10 @@
  * self-hosted Inline-SVGs (kein externer Request).
  * Tonzone: warm/holzig (hell).
  *
- * AKTIVIEREN (später): im contacts-Array unten je Eintrag `href` setzen — fertig.
- *   - E-Mail:    href: "mailto:dennis@dankdennis.de"
- *   - Instagram: href: "https://instagram.com/<handle>"
- *   - LinkedIn:  href: "https://www.linkedin.com/in/<handle>"
- *   - WhatsApp:  href: "https://wa.me/<nummer>"
- * Einträge mit href werden automatisch zu echten Links (target/rel für extern gesetzt),
- * solange href null ist, bleibt es ein nicht-navigierender Platzhalter.
+ * AKTIVIEREN (LinkedIn, sobald es den Account gibt): im contacts-Array unten `href`
+ * setzen (z. B. "https://www.linkedin.com/in/<handle>") — der Eintrag wird dann
+ * automatisch zum echten Link (target/rel für extern gesetzt). Ohne href bleibt es
+ * ein nicht-navigierender, ausgegrauter Platzhalter mit „bald"-Marker.
  *
  * M10: dezentes Bild über „Sag Hallo" (hand_heart, „Danke sagen") via astro:assets
  *      (<Picture>, AVIF/WebP + srcset, lazy). Foto-Zuordnung + Alt: docs/ (Foto-Plan M10).
@@ -46,10 +42,20 @@ const ICONS: Record<Brand, string> = {
 };
 
 const contacts: Contact[] = [
-  { label: "E-Mail", brand: "email", href: null },
-  { label: "Instagram", brand: "instagram", href: null },
+  { label: "E-Mail", brand: "email", href: "mailto:gigasetdennis@gmail.com" },
+  {
+    label: "Instagram",
+    brand: "instagram",
+    href: "https://www.instagram.com/dennismuller77",
+  },
+  // Noch kein LinkedIn-Account → bleibt ausgegraut (siehe Kopfkommentar).
   { label: "LinkedIn", brand: "linkedin", href: null },
-  { label: "WhatsApp", brand: "whatsapp", href: null },
+  // wa.me löst den WhatsApp-Benutzernamen auf (statt einer Telefonnummer).
+  {
+    label: "WhatsApp",
+    brand: "whatsapp",
+    href: "https://wa.me/dennismuller77",
+  },
 ];
 
 const isExternal = (href: string) => href.startsWith("http");
@@ -86,7 +92,8 @@ const isExternal = (href: string) => href.startsWith("http");
     >
       {
         contacts.map(({ label, brand, href }) => {
-          const klass = `contact__btn contact__btn--${brand}`;
+          // Ohne href: ausgegrauter „bald"-Button statt Link.
+          const klass = `contact__btn contact__btn--${brand}${href ? "" : " contact__btn--soon"}`;
           const icon = (
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d={ICONS[brand]} />
@@ -106,9 +113,12 @@ const isExternal = (href: string) => href.startsWith("http");
                   {label}
                 </a>
               ) : (
-                <span class={klass} data-placeholder role="link">
+                <span class={klass} data-placeholder aria-disabled="true">
                   {icon}
                   {label}
+                  <span class="contact__soon">
+                    bald<span class="visually-hidden"> verfügbar</span>
+                  </span>
                 </span>
               )}
             </li>
@@ -211,6 +221,40 @@ const isExternal = (href: string) => href.startsWith("http");
   }
   .contact__btn--whatsapp {
     --brand: var(--brand-whatsapp);
+  }
+
+  /* „bald": Kontaktweg existiert noch nicht → grau, kein Hover-Effekt, kein Cursor,
+     der die Pille als klickbar verspricht. Muss NACH den Plattform-Akzenten stehen,
+     damit --brand hier gewinnt. */
+  .contact__btn--soon {
+    --brand: var(--brand-soon);
+    color: var(--brand-soon);
+    cursor: default;
+  }
+
+  .contact__btn--soon:hover,
+  .contact__btn--soon:focus-visible {
+    background: none;
+    background-color: transparent;
+    border-color: var(--brand-soon);
+    color: var(--brand-soon);
+    transform: none;
+  }
+
+  .contact__btn--soon:hover svg,
+  .contact__btn--soon:focus-visible svg {
+    fill: var(--brand-soon);
+  }
+
+  /* Kleiner „bald"-Marker am Label. */
+  .contact__soon {
+    font-family: var(--font-body);
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-100);
+    text-transform: lowercase;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-pill);
+    padding: 0 var(--space-xs);
   }
 
   /* Instagram füllt sich beim Hover mit dem Marken-Verlauf statt einer Vollfarbe.

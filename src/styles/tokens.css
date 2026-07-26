@@ -38,6 +38,9 @@
   );
   --brand-linkedin: #0a66c2;
   --brand-whatsapp: #25d366;
+  /* Kontaktweg existiert noch nicht → Button wird ausgegraut statt verlinkt.
+     Warmes Grau, passend zur Holz-/Off-White-Basis. */
+  --brand-soon: #8c837a;
   /* Teilen-Dialog (M14): weitere Plattform-Farben (Simple-Icons-Brandwerte). */
   --brand-x: #000000; /* X (vormals Twitter) */
   --brand-telegram: #26a5e4;
