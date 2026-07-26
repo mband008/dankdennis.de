@@ -18,7 +18,8 @@
  * SPAM-SCHUTZ: WhatsApp enthält Dennis' Telefonnummer, die NICHT im Klartext im HTML
  * stehen soll (gleiche Regel wie im Impressum). Solche Einträge tragen `masked: true`
  * → gerendert wird ein <a> OHNE href, nur mit dem kodierten Ziel in data-href; das
- * Skript am Ende der Datei setzt den echten Link beim Laden. Kodierung erzeugen mit:
+ * Skript am Ende der Datei setzt den echten Link erst bei Klick-/Tastatur-Absicht
+ * (sonst zeigt die Statuszeile des Browsers die Nummer beim Hovern). Kodierung mit:
  *   node -e 'const u="<URL>";console.log([...Buffer.from(u).toString("base64")].reverse().join(""))'
  *
  * M10: dezentes Bild über „Sag Hallo" (hand_heart, „Danke sagen") via astro:assets
@@ -113,8 +114,10 @@ const isExternal = (href: string) => href.startsWith("http");
           return (
             <li>
               {href && masked ? (
-                // Kein href im HTML — das Skript unten setzt ihn beim Laden.
-                <a class={klass} data-href={href}>
+                // Kein href im HTML — das Skript unten setzt ihn erst bei
+                // Klick-/Tastatur-Absicht. role/tabindex, weil ein <a> ohne href
+                // weder Link-Rolle noch Tastatur-Fokus hat.
+                <a class={klass} data-href={href} role="link" tabindex="0">
                   {icon}
                   {label}
                 </a>
@@ -150,20 +153,31 @@ const isExternal = (href: string) => href.startsWith("http");
   /**
    * Maskierte Kontakt-Links scharfschalten (Spam-Schutz, siehe Kopfkommentar).
    * Im ausgelieferten HTML steht statt des Ziels nur der umgedrehte Base64-String in
-   * data-href — Crawler, die den Quelltext nach Telefonnummern absuchen, finden dort
-   * nichts. Beim Laden wird daraus ein ganz normaler externer Link.
+   * data-href — Crawler, die den Quelltext nach Telefonnummern absuchen, finden nichts.
+   *
+   * Der echte Link entsteht bewusst ERST bei Klick- oder Tastatur-Absicht (pointerdown/
+   * focus), nicht schon beim Laden: sonst verrät die Statuszeile des Browsers die Nummer
+   * beim bloßen Drüberfahren mit der Maus. Danach ist es ein ganz normaler Link — Klick,
+   * Mittelklick und „Link in neuem Tab öffnen" funktionieren wie gewohnt.
    * (Kein perfekter Schutz — ein Bot, der JS ausführt, kommt weiterhin dran.)
    */
+  const arm = (link: HTMLAnchorElement) => {
+    const encoded = link.dataset.href;
+    if (!encoded) return; // schon scharf
+
+    link.href = atob([...encoded].reverse().join(""));
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    delete link.dataset.href;
+  };
+
   document
     .querySelectorAll<HTMLAnchorElement>(".contact__btn[data-href]")
     .forEach((link) => {
-      const encoded = link.dataset.href;
-      if (!encoded) return;
-
-      link.href = atob([...encoded].reverse().join(""));
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      delete link.dataset.href;
+      // pointerdown deckt Maus und Touch ab und feuert VOR dem Klick, focus deckt die
+      // Tastatur ab (danach navigiert Enter nativ).
+      link.addEventListener("pointerdown", () => arm(link));
+      link.addEventListener("focus", () => arm(link));
     });
 </script>
 

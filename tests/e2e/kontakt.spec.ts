@@ -4,9 +4,12 @@ import { test, expect } from "@playwright/test";
  * Kontakt-Test (M8) — prüft die Sektion „Sag Hallo":
  *  1. Heading und Text-Kernphrase sind vorhanden.
  *  2. Alle vier Kontakt-Buttons (E-Mail/Instagram/LinkedIn/WhatsApp) sind da …
- *  3. … E-Mail/Instagram/WhatsApp als echte Links (extern mit target/rel),
- *     LinkedIn (noch kein Account) als ausgegrauter „bald"-Platzhalter.
- *  4. Keine Konsolen-Fehler.
+ *  3. … E-Mail/Instagram als echte Links (extern mit target/rel), LinkedIn (noch kein
+ *     Account) als ausgegrauter „bald"-Platzhalter.
+ *  4. WhatsApp trägt Dennis' Telefonnummer → maskiert: kein href im HTML, kein href
+ *     beim Hovern (sonst verriete die Statuszeile die Nummer), erst bei Klick-/
+ *     Tastatur-Absicht wird daraus ein echter Link.
+ *  5. Keine Konsolen-Fehler.
  * Läuft per playwright.config.ts auf Desktop- UND Mobile-Viewport (DoD: mobil + Desktop).
  */
 
@@ -17,8 +20,8 @@ const LINKS = [
     href: "https://www.instagram.com/dennismuller77",
     external: true,
   },
-  { label: "WhatsApp", href: "https://wa.me/4917637633091", external: true },
 ];
+const WA_HREF = "https://wa.me/4917637633091";
 const LABELS = ["E-Mail", "Instagram", "LinkedIn", "WhatsApp"];
 
 test("Heading und Text sind vorhanden", async ({ page }) => {
@@ -47,7 +50,7 @@ test("alle vier Kontakt-Buttons sind vorhanden und tragen ihr Icon", async ({
   }
 });
 
-test("E-Mail, Instagram und WhatsApp verlinken korrekt", async ({ page }) => {
+test("E-Mail und Instagram verlinken korrekt", async ({ page }) => {
   await page.goto("/");
 
   for (const { label, href, external } of LINKS) {
@@ -75,11 +78,65 @@ test("Telefonnummer steht nicht im ausgelieferten HTML (Spam-Schutz)", async ({
   expect(html).not.toContain("4917637633091");
   expect(html).not.toContain("+49 176 37633091");
   expect(html).not.toContain("wa.me/49");
+});
 
-  // Nach dem Laden ist es trotzdem ein normaler, sicherer externer Link.
+test("WhatsApp-Link entsteht nicht beim Laden und nicht beim Hovern", async ({
+  page,
+}) => {
+  await page.goto("/");
   const wa = page.locator("#kontakt a.contact__btn", { hasText: "WhatsApp" });
-  await expect(wa).toHaveAttribute("href", "https://wa.me/4917637633091");
+
+  // Direkt nach dem Laden: noch kein href — sonst stünde die Nummer im DOM.
+  await expect(wa).toBeVisible();
+  await expect(wa).not.toHaveAttribute("href", /.*/);
+  await expect(wa).toHaveAttribute("data-href", /.+/);
+
+  // Hovern allein darf nichts scharfschalten (Statuszeile bliebe sonst verräterisch).
+  await wa.hover();
+  await expect(wa).not.toHaveAttribute("href", /.*/);
+  expect(await page.locator("#kontakt").textContent()).not.toContain("7633091");
+});
+
+test("WhatsApp-Link wird bei Klick- und bei Tastatur-Absicht scharf", async ({
+  page,
+}) => {
+  // (a) Maus/Touch: pointerdown genügt, der anschließende Klick navigiert normal.
+  await page.goto("/");
+  let wa = page.locator("#kontakt a.contact__btn", { hasText: "WhatsApp" });
+  await wa.dispatchEvent("pointerdown");
+  await expect(wa).toHaveAttribute("href", WA_HREF);
+  await expect(wa).toHaveAttribute("target", "_blank");
+  await expect(wa).toHaveAttribute("rel", /noopener/);
   await expect(wa).not.toHaveAttribute("data-href", /.*/);
+
+  // (b) Tastatur: der Button ist fokussierbar, Fokus schaltet scharf → Enter navigiert.
+  await page.goto("/");
+  wa = page.locator("#kontakt a.contact__btn", { hasText: "WhatsApp" });
+  await wa.focus();
+  await expect(wa).toBeFocused();
+  await expect(wa).toHaveAttribute("href", WA_HREF);
+});
+
+test("Klick auf WhatsApp öffnet den wa.me-Link in einem neuen Tab", async ({
+  page,
+  context,
+}) => {
+  // wa.me leitet sofort auf api.whatsapp.com weiter — abfangen, damit der Test
+  // offline läuft und die aufgerufene URL unverfälscht prüfbar bleibt.
+  await context.route("https://wa.me/**", (route) =>
+    route.fulfill({ status: 200, contentType: "text/html", body: "ok" }),
+  );
+
+  await page.goto("/");
+  const wa = page.locator("#kontakt a.contact__btn", { hasText: "WhatsApp" });
+
+  const popup = context.waitForEvent("page");
+  await wa.click();
+  const opened = await popup;
+  await opened.waitForLoadState();
+
+  expect(opened.url()).toBe(WA_HREF);
+  await opened.close();
 });
 
 test("LinkedIn ist ausgegraut statt verlinkt (Account existiert noch nicht)", async ({
