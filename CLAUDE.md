@@ -97,9 +97,11 @@ Einmalig nötig für die Browser-Tests: `npx playwright install chromium` (lädt
 
 - Deutsch, Du-Form, verspielt aber glaubwürdig. Fußball begeistert, aber dosiert —
   Handwerk & Charakter führen.
-- Kontaktwege: E-Mail, Instagram und WhatsApp sind verlinkt (siehe `contacts`-Array in
-  `src/components/Contact.astro`). LinkedIn existiert noch nicht → ausgegrauter
-  „bald"-Button; sobald es den Account gibt, nur `href` eintragen.
+- Kontaktwege: E-Mail, Instagram, LinkedIn und WhatsApp sind verlinkt (siehe
+  `contacts`-Array in `src/components/Contact.astro`). Einträge ohne `href` rendern als
+  ausgegrauter „bald"-Platzhalter. WhatsApp trägt die Telefonnummer und ist deshalb
+  maskiert (`masked: true`) — die Nummer darf NICHT im ausgelieferten HTML stehen,
+  gleiche Regel wie im Impressum. Wird in `tests/e2e/` geprüft.
 - Fotos werden GEMEINSAM während der Implementierung ausgewählt (nicht vorab, gebündelt in
   M10). Bis dahin Platzhalterbilder. Vor Einbau optimieren (läuft über `astro:assets`).
 - Counter-Zahl: Spaßzahl (z. B. 1.337), rein dekorativ.

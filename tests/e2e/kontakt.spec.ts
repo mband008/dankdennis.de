@@ -4,8 +4,7 @@ import { test, expect } from "@playwright/test";
  * Kontakt-Test (M8) — prüft die Sektion „Sag Hallo":
  *  1. Heading und Text-Kernphrase sind vorhanden.
  *  2. Alle vier Kontakt-Buttons (E-Mail/Instagram/LinkedIn/WhatsApp) sind da …
- *  3. … E-Mail/Instagram als echte Links (extern mit target/rel), LinkedIn (noch kein
- *     Account) als ausgegrauter „bald"-Platzhalter.
+ *  3. … E-Mail/Instagram/LinkedIn als echte Links (extern mit target/rel).
  *  4. WhatsApp trägt Dennis' Telefonnummer → maskiert: kein href im HTML, kein href
  *     beim Hovern (sonst verriete die Statuszeile die Nummer), erst bei Klick-/
  *     Tastatur-Absicht wird daraus ein echter Link.
@@ -18,6 +17,11 @@ const LINKS = [
   {
     label: "Instagram",
     href: "https://www.instagram.com/dennismuller77",
+    external: true,
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/dennis-m%C3%BCller-2bb187425/",
     external: true,
   },
 ];
@@ -50,7 +54,7 @@ test("alle vier Kontakt-Buttons sind vorhanden und tragen ihr Icon", async ({
   }
 });
 
-test("E-Mail und Instagram verlinken korrekt", async ({ page }) => {
+test("E-Mail, Instagram und LinkedIn verlinken korrekt", async ({ page }) => {
   await page.goto("/");
 
   for (const { label, href, external } of LINKS) {
@@ -145,32 +149,16 @@ test("Klick auf WhatsApp öffnet den wa.me-Link in einem neuen Tab", async ({
   await opened.close();
 });
 
-test("LinkedIn ist ausgegraut statt verlinkt (Account existiert noch nicht)", async ({
+test("kein Kontaktweg ist mehr Platzhalter oder ausgegraut", async ({
   page,
 }) => {
   await page.goto("/");
 
-  const linkedin = page.locator("#kontakt .contact__btn", {
-    hasText: "LinkedIn",
-  });
-  // Kein Link, sondern markierter Platzhalter …
-  await expect(linkedin).toHaveJSProperty("tagName", "SPAN");
-  await expect(linkedin).toHaveAttribute("data-placeholder", "");
-  await expect(linkedin).toHaveAttribute("aria-disabled", "true");
-  await expect(linkedin).toHaveClass(/contact__btn--soon/);
-  // … mit sichtbarem „bald"-Marker.
-  await expect(linkedin.locator(".contact__soon")).toContainText("bald");
-  // Ausgegraut: Text- und Icon-Farbe unterscheiden sich vom aktiven LinkedIn-Blau.
-  const color = await linkedin.evaluate((el) => getComputedStyle(el).color);
-  expect(color).not.toBe("rgb(10, 102, 194)");
-  // Hover ändert nichts (kein Fill wie bei den aktiven Buttons).
-  const before = await linkedin.evaluate(
-    (el) => getComputedStyle(el).backgroundColor,
-  );
-  await linkedin.hover();
-  await expect
-    .poll(() => linkedin.evaluate((el) => getComputedStyle(el).backgroundColor))
-    .toBe(before);
+  const contact = page.locator("#kontakt");
+  await expect(contact.locator("[data-placeholder]")).toHaveCount(0);
+  await expect(contact.locator(".contact__btn--soon")).toHaveCount(0);
+  await expect(contact.locator(".contact__soon")).toHaveCount(0);
+  await expect(contact.getByText("bald")).toHaveCount(0);
 });
 
 test("Kontakt-Foto ist optimiert eingebunden (AVIF/WebP, srcset, Alt)", async ({

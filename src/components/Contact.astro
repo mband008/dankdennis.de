@@ -1,8 +1,8 @@
 ---
 /**
  * Contact.astro — Sektion 6 „Sag Hallo".
- * M8: Text + Kontakt-Buttons. E-Mail, Instagram und WhatsApp sind echte Links;
- * LinkedIn existiert (noch) nicht → ausgegrauter „bald"-Button statt Link.
+ * M8: Text + Kontakt-Buttons. Alle vier Wege (E-Mail, Instagram, LinkedIn, WhatsApp)
+ * sind verlinkt.
  *
  * Optik (Brand-on-Hover): Outline-Pille mit Plattform-Icon in Markenfarbe; bei
  * Hover/Fokus füllt sich der Button in der jeweiligen Plattformfarbe (Instagram als
@@ -10,10 +10,10 @@
  * self-hosted Inline-SVGs (kein externer Request).
  * Tonzone: warm/holzig (hell).
  *
- * AKTIVIEREN (LinkedIn, sobald es den Account gibt): im contacts-Array unten `href`
- * setzen (z. B. "https://www.linkedin.com/in/<handle>") — der Eintrag wird dann
- * automatisch zum echten Link (target/rel für extern gesetzt). Ohne href bleibt es
- * ein nicht-navigierender, ausgegrauter Platzhalter mit „bald"-Marker.
+ * WEITEREN KONTAKTWEG ERGÄNZEN: Eintrag ins contacts-Array unten. Mit `href` wird
+ * daraus ein echter Link (target/rel für extern gesetzt); `href: null` rendert einen
+ * nicht-navigierenden, ausgegrauten Platzhalter mit „bald"-Marker — praktisch für
+ * Kanäle, die es noch nicht gibt.
  *
  * SPAM-SCHUTZ: WhatsApp enthält Dennis' Telefonnummer, die NICHT im Klartext im HTML
  * stehen soll (gleiche Regel wie im Impressum). Solche Einträge tragen `masked: true`
@@ -58,8 +58,11 @@ const contacts: Contact[] = [
     brand: "instagram",
     href: "https://www.instagram.com/dennismuller77",
   },
-  // Noch kein LinkedIn-Account → bleibt ausgegraut (siehe Kopfkommentar).
-  { label: "LinkedIn", brand: "linkedin", href: null },
+  {
+    label: "LinkedIn",
+    brand: "linkedin",
+    href: "https://www.linkedin.com/in/dennis-m%C3%BCller-2bb187425/",
+  },
   // Kodiert: "https://wa.me/<Nummer international, ohne + und Leerzeichen>".
   // wa.me löst keine Benutzernamen auf, es muss die Nummer sein — deshalb maskiert.
   {
