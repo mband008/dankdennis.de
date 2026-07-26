@@ -10,12 +10,12 @@ description: "Datenschutzerklärung von Dank Dennis — datensparsam, keine Cook
 
 Verantwortlich für die Datenverarbeitung auf dieser Website ist:
 
-Michael Banditt  
-Friedrich-Schneider-Straße 6  
-06844 Dessau-Roßlau  
+Dennis Müller  
+Bahnhofstraße 1  
+06862 Dessau-Roßlau  
 Deutschland
 
-E-Mail: hallo@michaelbanditt.de
+E-Mail: gigasetdennis@gmail.com
 
 ## 2. Überblick
 
@@ -55,7 +55,7 @@ Zur einheitlichen Darstellung werden Schriftarten lokal auf dem Server dieser We
 
 ## 7. Kontaktaufnahme per E-Mail
 
-Wenn Sie mir per E-Mail (z. B. an hallo@michaelbanditt.de) eine Anfrage zukommen lassen, werden Ihre Angaben aus der E-Mail einschließlich der von Ihnen angegebenen Kontaktdaten zur Bearbeitung Ihres Anliegens verarbeitet. Rechtsgrundlage ist mein berechtigtes Interesse an der Beantwortung Ihrer Anfrage (Art. 6 Abs. 1 lit. f DSGVO) bzw., sofern Ihre Anfrage auf den Abschluss oder die Durchführung eines Vertrags gerichtet ist, Art. 6 Abs. 1 lit. b DSGVO. Diese Daten gebe ich nicht ohne Ihre Einwilligung weiter. Die Daten werden gelöscht, sobald Ihr Anliegen abschließend bearbeitet ist und keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
+Wenn Sie mir per E-Mail (z. B. an gigasetdennis@gmail.com) eine Anfrage zukommen lassen, werden Ihre Angaben aus der E-Mail einschließlich der von Ihnen angegebenen Kontaktdaten zur Bearbeitung Ihres Anliegens verarbeitet. Rechtsgrundlage ist mein berechtigtes Interesse an der Beantwortung Ihrer Anfrage (Art. 6 Abs. 1 lit. f DSGVO) bzw., sofern Ihre Anfrage auf den Abschluss oder die Durchführung eines Vertrags gerichtet ist, Art. 6 Abs. 1 lit. b DSGVO. Diese Daten gebe ich nicht ohne Ihre Einwilligung weiter. Die Daten werden gelöscht, sobald Ihr Anliegen abschließend bearbeitet ist und keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
 
 ## 8. Externe Links und Teilen-Funktion
 
