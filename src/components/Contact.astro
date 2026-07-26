@@ -15,6 +15,12 @@
  * automatisch zum echten Link (target/rel für extern gesetzt). Ohne href bleibt es
  * ein nicht-navigierender, ausgegrauter Platzhalter mit „bald"-Marker.
  *
+ * SPAM-SCHUTZ: WhatsApp enthält Dennis' Telefonnummer, die NICHT im Klartext im HTML
+ * stehen soll (gleiche Regel wie im Impressum). Solche Einträge tragen `masked: true`
+ * → gerendert wird ein <a> OHNE href, nur mit dem kodierten Ziel in data-href; das
+ * Skript am Ende der Datei setzt den echten Link beim Laden. Kodierung erzeugen mit:
+ *   node -e 'const u="<URL>";console.log([...Buffer.from(u).toString("base64")].reverse().join(""))'
+ *
  * M10: dezentes Bild über „Sag Hallo" (hand_heart, „Danke sagen") via astro:assets
  *      (<Picture>, AVIF/WebP + srcset, lazy). Foto-Zuordnung + Alt: docs/ (Foto-Plan M10).
  */
@@ -26,7 +32,10 @@ type Brand = "email" | "instagram" | "linkedin" | "whatsapp";
 interface Contact {
   label: string;
   brand: Brand;
+  /** Bei `masked: true` steht hier der kodierte, sonst der echte Link. */
   href: string | null;
+  /** Ziel enthält die Telefonnummer → erst per Skript einsetzen (s. o.). */
+  masked?: boolean;
 }
 
 // SVG-Pfade (viewBox 0 0 24 24). Instagram/LinkedIn/WhatsApp: Simple Icons (CC0).
@@ -50,11 +59,13 @@ const contacts: Contact[] = [
   },
   // Noch kein LinkedIn-Account → bleibt ausgegraut (siehe Kopfkommentar).
   { label: "LinkedIn", brand: "linkedin", href: null },
-  // wa.me löst den WhatsApp-Benutzernamen auf (statt einer Telefonnummer).
+  // Kodiert: "https://wa.me/<Nummer international, ohne + und Leerzeichen>".
+  // wa.me löst keine Benutzernamen auf, es muss die Nummer sein — deshalb maskiert.
   {
     label: "WhatsApp",
     brand: "whatsapp",
-    href: "https://wa.me/dennismuller77",
+    href: "xkDMzMjN3MjN3ETO08SZt5SY39yL6MHc0RHa",
+    masked: true,
   },
 ];
 
@@ -91,7 +102,7 @@ const isExternal = (href: string) => href.startsWith("http");
       style="--reveal-delay: var(--reveal-stage)"
     >
       {
-        contacts.map(({ label, brand, href }) => {
+        contacts.map(({ label, brand, href, masked }) => {
           // Ohne href: ausgegrauter „bald"-Button statt Link.
           const klass = `contact__btn contact__btn--${brand}${href ? "" : " contact__btn--soon"}`;
           const icon = (
@@ -101,7 +112,13 @@ const isExternal = (href: string) => href.startsWith("http");
           );
           return (
             <li>
-              {href ? (
+              {href && masked ? (
+                // Kein href im HTML — das Skript unten setzt ihn beim Laden.
+                <a class={klass} data-href={href}>
+                  {icon}
+                  {label}
+                </a>
+              ) : href ? (
                 <a
                   class={klass}
                   href={href}
@@ -128,6 +145,27 @@ const isExternal = (href: string) => href.startsWith("http");
     </ul>
   </div>
 </section>
+
+<script>
+  /**
+   * Maskierte Kontakt-Links scharfschalten (Spam-Schutz, siehe Kopfkommentar).
+   * Im ausgelieferten HTML steht statt des Ziels nur der umgedrehte Base64-String in
+   * data-href — Crawler, die den Quelltext nach Telefonnummern absuchen, finden dort
+   * nichts. Beim Laden wird daraus ein ganz normaler externer Link.
+   * (Kein perfekter Schutz — ein Bot, der JS ausführt, kommt weiterhin dran.)
+   */
+  document
+    .querySelectorAll<HTMLAnchorElement>(".contact__btn[data-href]")
+    .forEach((link) => {
+      const encoded = link.dataset.href;
+      if (!encoded) return;
+
+      link.href = atob([...encoded].reverse().join(""));
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      delete link.dataset.href;
+    });
+</script>
 
 <style>
   .contact__inner {

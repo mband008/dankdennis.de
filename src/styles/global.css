@@ -297,3 +297,29 @@ p {
 .prose strong {
   font-weight: var(--fw-bold);
 }
+
+/* ---------- Telefonnummer erst auf Klick (Spam-Schutz) ---------- *
+ * Die Nummer steht NICHT im HTML, sondern nur kodiert im data-Attribut; erst der
+ * Klick baut daraus einen tel:-Link (Skript in Legal.astro). Auch diese Regeln sind
+ * global, weil sie auf gerendertem Markdown greifen (siehe Kommentar oben).
+ */
+.phone-reveal__btn {
+  font: inherit;
+  color: var(--color-red);
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-xs);
+  cursor: pointer;
+}
+
+.phone-reveal__btn:hover,
+.phone-reveal__btn:focus-visible {
+  color: var(--text-on-dark);
+  background-color: var(--color-red);
+}
+
+.phone-reveal__hint {
+  font-size: var(--fs-100);
+  opacity: 0.7;
+}

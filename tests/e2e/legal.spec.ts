@@ -24,6 +24,40 @@ test("Impressum rendert mit h1, Titel und Kern-Inhalten", async ({ page }) => {
   await expect(main).toContainText("gigasetdennis@gmail.com");
 });
 
+test("Telefonnummer steht nicht im Klartext im Quelltext (Spam-Schutz)", async ({
+  page,
+}) => {
+  const response = await page.goto("/impressum");
+  const html = (await response?.text()) ?? "";
+
+  // Weder formatiert noch als reine Ziffernkette darf die Nummer im HTML stehen.
+  expect(html).not.toContain("+49 176 37633091");
+  expect(html).not.toContain("4917637633091");
+  expect(html).not.toContain("017637633091");
+  // Auch nicht im gerenderten DOM, solange niemand geklickt hat.
+  const body = (await page.locator("body").textContent()) ?? "";
+  expect(body.replace(/\s/g, "")).not.toContain("37633091");
+});
+
+test("Telefonnummer erscheint erst auf Klick — als tel:-Link", async ({
+  page,
+}) => {
+  await page.goto("/impressum");
+
+  const btn = page.getByRole("button", { name: "Nummer anzeigen" });
+  await expect(btn).toBeVisible();
+
+  await btn.click();
+
+  // Button ist weg, an seiner Stelle steht der anrufbare Link mit der Nummer.
+  await expect(btn).toHaveCount(0);
+  const tel = page.locator(".phone-reveal a");
+  await expect(tel).toHaveText("+49 176 37633091");
+  await expect(tel).toHaveAttribute("href", "tel:+4917637633091");
+  // Der Spam-Hinweis verschwindet mit dem Button.
+  await expect(page.locator(".phone-reveal__hint")).toHaveCount(0);
+});
+
 test("Datenschutz rendert mit h1, Titel und Kern-Inhalten", async ({
   page,
 }) => {

@@ -19,6 +19,8 @@ Deutschland
 
 E-Mail: gigasetdennis@gmail.com
 
+<p class="phone-reveal">Telefon: <button type="button" class="phone-reveal__btn" data-phone="==QM5AzMzYzNzAiN3EDI5QzK">Nummer anzeigen</button> <span class="phone-reveal__hint">(zum Schutz vor Spam-Bots ausgeblendet)</span></p>
+
 ## Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
 
 Dennis Müller  
