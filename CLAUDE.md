@@ -97,7 +97,9 @@ Einmalig nötig für die Browser-Tests: `npx playwright install chromium` (lädt
 
 - Deutsch, Du-Form, verspielt aber glaubwürdig. Fußball begeistert, aber dosiert —
   Handwerk & Charakter führen.
-- Kontaktwege sind NOCH OFFEN → als Platzhalter-Buttons bauen, später nur Links eintragen.
+- Kontaktwege: E-Mail, Instagram und WhatsApp sind verlinkt (siehe `contacts`-Array in
+  `src/components/Contact.astro`). LinkedIn existiert noch nicht → ausgegrauter
+  „bald"-Button; sobald es den Account gibt, nur `href` eintragen.
 - Fotos werden GEMEINSAM während der Implementierung ausgewählt (nicht vorab, gebündelt in
   M10). Bis dahin Platzhalterbilder. Vor Einbau optimieren (läuft über `astro:assets`).
 - Counter-Zahl: Spaßzahl (z. B. 1.337), rein dekorativ.
