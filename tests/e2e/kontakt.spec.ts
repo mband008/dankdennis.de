@@ -65,6 +65,23 @@ test("E-Mail, Instagram und WhatsApp verlinken korrekt", async ({ page }) => {
   }
 });
 
+test("Telefonnummer steht nicht im ausgelieferten HTML (Spam-Schutz)", async ({
+  page,
+}) => {
+  const response = await page.goto("/");
+  const html = (await response?.text()) ?? "";
+
+  // Der WhatsApp-Link darf erst per Skript entstehen, nicht im Quelltext stehen.
+  expect(html).not.toContain("4917637633091");
+  expect(html).not.toContain("+49 176 37633091");
+  expect(html).not.toContain("wa.me/49");
+
+  // Nach dem Laden ist es trotzdem ein normaler, sicherer externer Link.
+  const wa = page.locator("#kontakt a.contact__btn", { hasText: "WhatsApp" });
+  await expect(wa).toHaveAttribute("href", "https://wa.me/4917637633091");
+  await expect(wa).not.toHaveAttribute("data-href", /.*/);
+});
+
 test("LinkedIn ist ausgegraut statt verlinkt (Account existiert noch nicht)", async ({
   page,
 }) => {
