@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/Legal.astro
 title: "Impressum — Dank Dennis"
-description: "Impressum von Dank Dennis — Diensteanbieter Michael Banditt, Dessau-Roßlau."
+description: "Impressum von Dank Dennis — Diensteanbieter Dennis Müller, Dessau-Roßlau."
 ---
 
 # Impressum
@@ -10,25 +10,20 @@ Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG).
 
 ## Diensteanbieter
 
-Michael Banditt  
-Friedrich-Schneider-Straße 6  
-06844 Dessau-Roßlau  
+Dennis Müller  
+Bahnhofstraße 1  
+06862 Dessau-Roßlau  
 Deutschland
 
 ## Kontakt
 
-E-Mail: hallo@michaelbanditt.de
-
-## Umsatzsteuer-Identifikationsnummer
-
-Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz:  
-DE360953607
+E-Mail: gigasetdennis@gmail.com
 
 ## Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
 
-Michael Banditt  
-Friedrich-Schneider-Straße 6  
-06844 Dessau-Roßlau
+Dennis Müller  
+Bahnhofstraße 1  
+06862 Dessau-Roßlau
 
 ## Verbraucherstreitbeilegung / Universalschlichtungsstelle
 

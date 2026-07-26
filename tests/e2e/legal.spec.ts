@@ -19,9 +19,9 @@ test("Impressum rendert mit h1, Titel und Kern-Inhalten", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Impressum");
 
   const main = page.locator("main#main");
-  await expect(main).toContainText("Michael Banditt");
+  await expect(main).toContainText("Dennis Müller");
   await expect(main).toContainText("Diensteanbieter");
-  await expect(main).toContainText("DE360953607");
+  await expect(main).toContainText("gigasetdennis@gmail.com");
 });
 
 test("Datenschutz rendert mit h1, Titel und Kern-Inhalten", async ({
@@ -37,7 +37,7 @@ test("Datenschutz rendert mit h1, Titel und Kern-Inhalten", async ({
   const main = page.locator("main#main");
   await expect(main).toContainText("Verantwortlicher");
   await expect(main).toContainText("Hetzner");
-  await expect(main).toContainText("Michael Banditt");
+  await expect(main).toContainText("Dennis Müller");
 });
 
 test("SAFETY-GUARD: /datenschutz enthält keine Entwurfs-/Platzhalter-Marker", async ({
