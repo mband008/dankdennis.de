@@ -157,9 +157,9 @@ const isExternal = (href: string) => href.startsWith("http");
    *
    * Der echte Link entsteht bewusst ERST bei Klick- oder Tastatur-Absicht (pointerdown/
    * focus), nicht schon beim Laden: sonst verrät die Statuszeile des Browsers die Nummer
-   * beim bloßen Drüberfahren mit der Maus. Danach ist es ein ganz normaler Link — Klick,
-   * Mittelklick und „Link in neuem Tab öffnen" funktionieren wie gewohnt.
-   * (Kein perfekter Schutz — ein Bot, der JS ausführt, kommt weiterhin dran.)
+   * beim bloßen Drüberfahren mit der Maus. Danach ist es ein ganz normaler Link — Klick
+   * und Mittelklick funktionieren wie gewohnt.
+   * (Kein perfekter Schutz — wer den Link benutzt oder JS ausführt, sieht die Nummer.)
    */
   const arm = (link: HTMLAnchorElement) => {
     const encoded = link.dataset.href;
@@ -171,13 +171,33 @@ const isExternal = (href: string) => href.startsWith("http");
     delete link.dataset.href;
   };
 
+  // Ein Klick — auch der rechte — fokussiert das Element. Ohne diese Marke würde der
+  // focus-Handler unten bei „Rechtsklick → Untersuchen" mit scharfschalten.
+  // -Infinity, nicht 0: sonst gälte ein Fokus in den ersten 300 ms nach dem Laden
+  // fälschlich als „kam aus einem Klick".
+  let lastPointerDown = -Infinity;
+  document.addEventListener(
+    "pointerdown",
+    () => {
+      lastPointerDown = performance.now();
+    },
+    true,
+  );
+
   document
     .querySelectorAll<HTMLAnchorElement>(".contact__btn[data-href]")
     .forEach((link) => {
-      // pointerdown deckt Maus und Touch ab und feuert VOR dem Klick, focus deckt die
-      // Tastatur ab (danach navigiert Enter nativ).
-      link.addEventListener("pointerdown", () => arm(link));
-      link.addEventListener("focus", () => arm(link));
+      link.addEventListener("pointerdown", (event) => {
+        // NUR Links- (0) und Mittelklick (1) — ein Rechtsklick will das Kontextmenü,
+        // nicht den Link.
+        if (event.button === 0 || event.button === 1) arm(link);
+      });
+
+      // Tastatur: Fokus per Tab schaltet scharf, danach navigiert Enter nativ.
+      // Fokus, der direkt aus einem Klick stammt, zählt nicht (s. o.).
+      link.addEventListener("focus", () => {
+        if (performance.now() - lastPointerDown > 300) arm(link);
+      });
     });
 </script>
 

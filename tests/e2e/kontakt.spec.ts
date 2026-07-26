@@ -95,6 +95,12 @@ test("WhatsApp-Link entsteht nicht beim Laden und nicht beim Hovern", async ({
   await wa.hover();
   await expect(wa).not.toHaveAttribute("href", /.*/);
   expect(await page.locator("#kontakt").textContent()).not.toContain("7633091");
+
+  // Rechtsklick ebenfalls nicht — so kommt „Untersuchen"/Kontextmenü nicht an die
+  // Nummer, ohne dass jemand den Link überhaupt benutzen wollte.
+  await wa.click({ button: "right" });
+  await expect(wa).not.toHaveAttribute("href", /.*/);
+  await expect(wa).toHaveAttribute("data-href", /.+/);
 });
 
 test("WhatsApp-Link wird bei Klick- und bei Tastatur-Absicht scharf", async ({
