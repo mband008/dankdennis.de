@@ -17,7 +17,7 @@ const LINKS = [
     href: "https://www.instagram.com/dennismuller77",
     external: true,
   },
-  { label: "WhatsApp", href: "https://wa.me/dennismuller77", external: true },
+  { label: "WhatsApp", href: "https://wa.me/4917637633091", external: true },
 ];
 const LABELS = ["E-Mail", "Instagram", "LinkedIn", "WhatsApp"];
 

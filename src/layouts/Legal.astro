@@ -8,7 +8,8 @@
  *  - „← Zur Startseite"-Link oben,
  *  - ruhige Fließtext-Typografie über `.prose` (Regeln in global.css),
  *  - Footer ohne Konfetti-Egg (der Handler wird via Hero geladen, den es hier
- *    nicht gibt — ein toter Button wäre schlechter als kein Button).
+ *    nicht gibt — ein toter Button wäre schlechter als kein Button),
+ *  - das Skript für die auf Klick eingeblendete Telefonnummer (Spam-Schutz, s. u.).
  * Inhalt im <main>-Landmark (A11y); h1 kommt aus dem Markdown.
  */
 import Base from "./Base.astro";
@@ -31,3 +32,36 @@ const { frontmatter } = Astro.props;
     </div>
   </main>
 </Base>
+
+<script>
+  /**
+   * Telefonnummer erst auf Klick sichtbar (Spam-Schutz).
+   * Im ausgelieferten HTML steht die Nummer NIRGENDS im Klartext — nur als
+   * umgedrehter Base64-String im data-phone-Attribut. Crawler, die den Quelltext
+   * nach Nummern-Mustern durchsuchen, finden dort nichts; erst der Klick dekodiert
+   * und ersetzt den Button durch einen echten tel:-Link.
+   * (Kein perfekter Schutz — ein Bot, der JS ausführt, kommt weiterhin dran.)
+   */
+  const buttons =
+    document.querySelectorAll<HTMLButtonElement>(".phone-reveal__btn");
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const encoded = btn.dataset.phone;
+      if (!encoded) return;
+
+      const number = atob([...encoded].reverse().join(""));
+      const link = document.createElement("a");
+      link.href = `tel:${number.replace(/\s/g, "")}`;
+      link.textContent = number;
+
+      // Hinweis vor dem Austausch greifen — danach hängt der Button nicht mehr im DOM.
+      btn
+        .closest(".phone-reveal")
+        ?.querySelector(".phone-reveal__hint")
+        ?.remove();
+      btn.replaceWith(link);
+      link.focus(); // Tastatur-Fokus wandert auf den neuen Link statt ins Leere.
+    });
+  });
+</script>

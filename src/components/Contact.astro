@@ -50,11 +50,12 @@ const contacts: Contact[] = [
   },
   // Noch kein LinkedIn-Account → bleibt ausgegraut (siehe Kopfkommentar).
   { label: "LinkedIn", brand: "linkedin", href: null },
-  // wa.me löst den WhatsApp-Benutzernamen auf (statt einer Telefonnummer).
+  // wa.me erwartet die Nummer international ohne „+" und ohne Leerzeichen
+  // (Benutzernamen löst wa.me nicht auf).
   {
     label: "WhatsApp",
     brand: "whatsapp",
-    href: "https://wa.me/dennismuller77",
+    href: "https://wa.me/4917637633091",
   },
 ];
 
