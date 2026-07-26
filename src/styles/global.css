@@ -298,11 +298,6 @@ p {
   font-weight: var(--fw-bold);
 }
 
-/* ---------- Telefonnummer erst auf Klick (Spam-Schutz) ---------- *
- * Die Nummer steht NICHT im HTML, sondern nur kodiert im data-Attribut; erst der
- * Klick baut daraus einen tel:-Link (Skript in Legal.astro). Auch diese Regeln sind
- * global, weil sie auf gerendertem Markdown greifen (siehe Kommentar oben).
- */
 .phone-reveal__btn {
   font: inherit;
   color: var(--color-red);
