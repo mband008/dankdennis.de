@@ -61,6 +61,7 @@ const isExternal = (href: string) => href.startsWith("http");
       <Picture
         src={heartImg}
         formats={["avif", "webp"]}
+        fallbackFormat="jpeg"
         alt="Dennis mit der Hand auf dem Herzen, dankbare Geste"
         widths={[200, 320, 480]}
         sizes="200px"
